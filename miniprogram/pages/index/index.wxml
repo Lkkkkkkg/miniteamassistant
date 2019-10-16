@@ -1,0 +1,14 @@
+<view class="page">
+  <view class="cards">
+    <view class="card" wx:for="{{teamList}}">
+      <image class="card-img" src="{{item.gameIcon}}"></image>
+      <view class="card-content">
+        <view>预计开黑时间：{{item.startTime}}</view>
+        <view>{{item.currentNum}}/{{item.maxNum}}</view>
+        <view>等待中</view>
+      </view>
+      <view class="button-join">加入</view>
+    </view>
+  </view>
+  <navigator class="button-add" url="./pages/edit/edit">发</navigator>
+</view>
