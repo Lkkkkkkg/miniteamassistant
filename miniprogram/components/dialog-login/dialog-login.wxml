@@ -1,0 +1,13 @@
+<view class="dialog {{show ? 'dialog-show':''}}">
+  <view class="dialog-content">
+    <view class="dialog-title">还没有登陆哦</view>
+  </view>
+  <view class="dialog-action">
+    <button class="dialog-confirm" open-type="getUserInfo" bindgetuserinfo="bindgetuserinfo" hover-class="dialog-confirm-hover">
+      <text class="dialog-confirm-label">{{loging ? '授权中':'授权登陆'}}</text>
+    </button>
+    <button class="dialog-cancel" hover-class="dialog-cancel-hover" bindtap="closeDialog">
+      关闭
+    </button>
+  </view>
+</view>

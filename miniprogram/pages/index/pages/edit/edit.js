@@ -1,3 +1,4 @@
+const app = getApp();
 const db = wx.cloud.database();
 Page({
 
@@ -9,14 +10,15 @@ Page({
     gameTypeIndex: 0,
     maxNumList: [2, 3, 4, 5],
     maxNumIndex: 3,
-    startTime: '12:01'
+    startTime: '12:01',
+    submiting: false
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-
+    console.log(getCurrentPages()[getCurrentPages().length - 2])
   },
 
   bindTypeChange(e) {
@@ -35,28 +37,39 @@ Page({
     })
   },
   submit() {
-    wx.cloud.callFunction({
-      name: 'addTeam',
-      data: {
-        gameIcon: 'https://img.csgo.com.cn/csgo/82/bb/82bbb711e3f041a6e043bdce1d98f5741568276051.jpg',
-        gameType: this.data.gameTypeList[this.data.gameTypeIndex],
-        maxNum: this.data.maxNumList[this.data.maxNumIndex],
-        startTime: this.data.startTime
-      }
+    this.setData({
+      submiting: true
     })
-    .then(res=>{
-      console.log('[云函数] [addTeam] 调用成功', res);
-      wx.navigateBack();
-    })
-    .catch(err=>{
-      console.log('[云函数] [addTeam] 调用失败', err);
-      wx.showToast({
-        icon: 'none',
-        title: '云函数调用失败'
+    db.collection('teams').add({
+        data: {
+          gameIcon: 'https://img.csgo.com.cn/csgo/82/bb/82bbb711e3f041a6e043bdce1d98f5741568276051.jpg',
+          gameType: this.data.gameTypeList[this.data.gameTypeIndex],
+          maxNum: this.data.maxNumList[this.data.maxNumIndex],
+          startTime: this.data.startTime,
+          creator_id: app.globalData.userInfo._id,
+          participant: [app.globalData.userInfo._id]
+        }
       })
-      console.log(err)
-    })
-
+      .then(res => {
+        console.log('[数据库: teams] [添加记录] 成功：', res);
+        wx.navigateBack({
+          success() {
+            getCurrentPages()[0].getTeamList();
+          }
+        });
+      })
+      .catch(err => {
+        wx.showToast({
+          icon: 'none',
+          title: '添加记录失败'
+        })
+        console.error('[数据库: teams] [添加记录] 失败：', err);
+      })
+      .finally(()=>{
+        this.setData({
+          submiting: false
+        })
+      })
   },
   /**
    * 生命周期函数--监听页面初次渲染完成

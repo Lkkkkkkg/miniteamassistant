@@ -1,3 +1,6 @@
 {
-  "usingComponents": {}
+  "usingComponents": {
+    "dialog-login": "/components/dialog-login/dialog-login"
+  },
+  "enablePullDownRefresh": true
 }

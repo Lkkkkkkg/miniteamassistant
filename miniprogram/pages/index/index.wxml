@@ -5,10 +5,11 @@
       <view class="card-content">
         <view>预计开黑时间：{{item.startTime}}</view>
         <view>{{item.participant.length}}/{{item.maxNum}}</view>
-        <view>等待中</view>
+        <view>{{item.participant.length < item.maxNum ? '等待中' :'已满员'}}</view>
       </view>
-      <!-- <button class="button-join" open-type="getUserInfo" bindgetuserinfo="bindgetuserinfo">加</button> -->
+      <view wx:if="{{item.participant.length < item.maxNum}}" class="button-join" data-item="{{item}}" bindtap="handleClickJoin">{{joining ? '加入中' :'加入'}}</view>
     </view>
   </view>
-  <navigator class="button-add" url="./pages/edit/edit">发</navigator>
+  <view class="button-add"  bindtap="handleClickAdd">组</view>
+  <dialog-login show="{{loginDialogShow}}" bind:closeLoginDialog="closeLoginDialog"></dialog-login>
 </view>

@@ -1,6 +1,6 @@
 <view class="page">
   <view class="page-header">
-    <view class="button-submit" bindtap="submit">发布</view>
+    <view class="button-submit" bindtap="submit">{{submiting ? '确定中':'确定'}}</view>
   </view>
   <view class="form">
     <view class="form-item">
