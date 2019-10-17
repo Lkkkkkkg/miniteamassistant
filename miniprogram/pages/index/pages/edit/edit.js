@@ -51,21 +51,35 @@ Page({
         }
       })
       .then(res => {
-        console.log('[数据库: teams] [添加记录] 成功：', res);
-        wx.navigateBack({
-          success() {
-            getCurrentPages()[0].getTeamList();
-          }
-        });
+        db.collection('users').doc(app.globalData.userInfo._id).update({
+            data: {
+              teams: db.command.push(res._id)
+            }
+          }).then(res1 => {
+            //本地修改用户信息
+            app.globalData.userInfo.teams.push(res._id);
+            //缓存用户信息
+            wx.setStorageSync('userInfo', app.globalData.userInfo);
+            wx.navigateBack({
+              success() {
+                getCurrentPages()[0].getTeamList();
+              }
+            });
+          })
+          .catch(err1 => {
+            wx.showToast({
+              icon: 'none',
+              title: '更新记录失败'
+            })
+          })
       })
       .catch(err => {
         wx.showToast({
           icon: 'none',
           title: '添加记录失败'
         })
-        console.error('[数据库: teams] [添加记录] 失败：', err);
       })
-      .finally(()=>{
+      .finally(() => {
         this.setData({
           submiting: false
         })

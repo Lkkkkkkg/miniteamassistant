@@ -7,7 +7,7 @@
         <view>{{item.participant.length}}/{{item.maxNum}}</view>
         <view>{{item.participant.length < item.maxNum ? '等待中' :'已满员'}}</view>
       </view>
-      <view wx:if="{{item.participant.length < item.maxNum}}" class="button-join" data-item="{{item}}" bindtap="handleClickJoin">{{joining ? '加入中' :'加入'}}</view>
+      <view wx:if="{{item.participant.length < item.maxNum}}" class="button-join" data-_id="{{item._id}}" bindtap="handleClickJoin">{{item.joining ? '加入中' :'加入'}}</view>
     </view>
   </view>
   <view class="button-add"  bindtap="handleClickAdd">组</view>

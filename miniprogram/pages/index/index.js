@@ -7,8 +7,7 @@ Page({
    */
   data: {
     teamList: null,
-    loginDialogShow: false,
-    joining: false
+    loginDialogShow: false
   },
 
   /**
@@ -21,7 +20,6 @@ Page({
     db.collection('teams')
       .get()
       .then(res => {
-        console.log('[数据库: teams] [查询记录] 成功：', res);
         this.setData({
           teamList: res.data
         })
@@ -31,7 +29,6 @@ Page({
           icon: 'none',
           title: '查询记录失败'
         })
-        console.error('[数据库: teams] [查询记录] 失败：', err)
       })
   },
   closeLoginDialog() {
@@ -52,7 +49,11 @@ Page({
   },
   handleClickJoin(e) {
     if (app.globalData.userInfo) {
-      const findParticipant = e.currentTarget.dataset.item.participant.find(item => {
+      const teamList = this.data.teamList;
+      const teamItem = teamList.find(item => {
+        return item._id === e.currentTarget.dataset._id
+      })
+      const findParticipant = teamItem.participant.find(item => {
         return item === app.globalData.userInfo._id
       })
       if (findParticipant) {
@@ -61,23 +62,29 @@ Page({
           title: '你已加入该队伍'
         })
       } else {
+        teamItem.joining = true;
         this.setData({
-          joining: true
+          teamList
         })
-        //云函数添加组队人员
-        wx.cloud.callFunction({
-            name: 'joinTeam',
-            data: {
-              _id: e.currentTarget.dataset.item._id,
-              user_id: app.globalData.userInfo._id
-            }
-          })
+        //队伍添加参队人员
+        const p1 = wx.cloud.callFunction({
+          name: 'joinTeam',
+          data: {
+            _id: e.currentTarget.dataset._id,
+            user_id: app.globalData.userInfo._id
+          }
+        });
+        //用户添加参与队伍
+        const p2 = db.collection('users').doc(app.globalData.userInfo._id).update({
+          data: {
+            teams: db.command.push(teamItem._id)
+          }
+        });
+        Promise.all([p1,p2])
           .then(res => {
             //本地数组添加组队人员
-            const teamList = this.data.teamList;
-            teamList.find(item => {
-              return item._id === e.currentTarget.dataset.item._id
-            }).participant.push(app.globalData.userInfo._id);
+            teamItem.participant.push(app.globalData.userInfo._id);
+            teamItem.joining = false;
             this.setData({
               teamList
             })
@@ -85,18 +92,15 @@ Page({
               icon: 'none',
               title: '加入队伍成功'
             })
-            console.log('[数据库: teams] [更新记录] 成功：', res);
           })
           .catch(err => {
+            teamItem.joining = false;
+            this.setData({
+              teamList
+            })
             wx.showToast({
               icon: 'none',
               title: '更新记录失败'
-            })
-            console.error('[数据库: teams] [更新记录] 失败：', err)
-          })
-          .finally(()=>{
-            this.setData({
-              joining: false
             })
           })
       }
