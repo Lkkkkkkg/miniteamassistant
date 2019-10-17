@@ -1,1 +1,30 @@
-/* miniprogram/pages/index/pages/edit.wxss */
+page {
+  background-color: #fff;
+}
+.page-header {
+  height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0  30rpx;
+}
+
+.button-submit {
+  margin-left: auto;
+}
+
+.form {
+  padding: 0 30rpx;
+}
+.form-item {
+  background-color: #f6f6f6;
+  height: 100rpx;
+  line-height: 100rpx;
+  margin-bottom: 20rpx;
+  padding: 0 30rpx;
+  display: flex;
+}
+
+.form-label {
+  margin-right: 30rpx;
+}
