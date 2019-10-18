@@ -1,5 +1,8 @@
 const cloud = require('wx-server-sdk');
-cloud.init()
+cloud.init({
+  // API 调用都保持和云函数当前所在环境一致
+  env: cloud.DYNAMIC_CURRENT_ENV
+})
 exports.main = async(event, context) => {
 
   // 获取 WX Context (微信调用上下文)，包括 OPENID、APPID、及 UNIONID（需满足 UNIONID 获取条件）
@@ -28,25 +31,29 @@ exports.main = async(event, context) => {
           Promise.all([p1, p2]).then((res1, res2) => {
               resolve({
                 code: 1000,
+                data: {},
                 message: '加入队伍成功'
               })
             })
             .catch((err1, err2) => {
               reject({
                 code: 2000,
+                data: {},
                 message: err1.message || err2.message
               })
             })
         } else {
-          resolve ({
+          resolve({
             code: 1001,
+            data: {},
             message: '加入失败：队伍已满'
           })
         }
       })
       .catch(err => {
-        reject ({
+        reject({
           code: 2000,
+          data: {},
           message: err.message
         })
       })
