@@ -3,15 +3,17 @@
     <view class="card" wx:for="{{teamList}}" wx:key="{{item._id}}">
       <image class="card-img" src="{{item.gameIcon}}"></image>
       <view class="card-content">
+        <view>{{item.teamName}}</view>
         <view>预计开黑时间：{{item.startTime}}</view>
         <view class="avatar-box">
           <image class="avatar" wx:for="{{item.participant}}" src="{{item.avatarUrl}}" wx:key="{{item._id}}"></image>
         </view>
-        <view>{{item.participant.length}}/{{item.maxNum}} {{item.participant.length < item.maxNum ? '等待中' :'已满员'}}</view>
+        <view>{{item.participant.length}}/{{item.maxNum}} {{item.participant.length
+          < item.maxNum ? '等待中' : '已满员'}}</view>
+        </view>
+        <view wx:if="{{item.participant.length < item.maxNum}}" class="button-join" data-_id="{{item._id}}" bindtap="handleClickJoin">{{item.joining ? '加入中' :'加入'}}</view>
       </view>
-      <view wx:if="{{item.participant.length < item.maxNum}}" class="button-join" data-_id="{{item._id}}" bindtap="handleClickJoin">{{item.joining ? '加入中' :'加入'}}</view>
     </view>
+    <view class="button-add" bindtap="handleClickAdd">组</view>
+    <dialog-login show="{{loginDialogShow}}" bind:closeLoginDialog="closeLoginDialog"></dialog-login>
   </view>
-  <view class="button-add"  bindtap="handleClickAdd">组</view>
-  <dialog-login show="{{loginDialogShow}}" bind:closeLoginDialog="closeLoginDialog"></dialog-login>
-</view>

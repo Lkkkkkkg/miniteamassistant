@@ -6,11 +6,12 @@ Page({
    * 页面的初始数据
    */
   data: {
+    teamName: '',
     gameTypeList: ['CSGO'],
     gameTypeIndex: 0,
     maxNumList: [2, 3, 4, 5],
     maxNumIndex: 3,
-    startTime: '12:01',
+    startTime: '00:00',
     submiting: false
   },
 
@@ -20,7 +21,11 @@ Page({
   onLoad: function(options) {
     console.log(getCurrentPages()[getCurrentPages().length - 2])
   },
-
+  handleTeamNameInput(e) {
+    this.setData({
+      teamName: e.detail.value
+    })
+  },
   bindTypeChange(e) {
     this.setData({
       gameTypeIndex: e.detail.value
@@ -37,13 +42,21 @@ Page({
     })
   },
   submit() {
+    if(!this.data.teamName) {
+      wx.showToast({
+        icon: 'none',
+        title: '请输入队伍名'
+      });
+      return;
+    }
     this.setData({
       submiting: true
     })
     db.collection('teams').add({
         data: {
+          teamName: this.data.teamName,
           gameIcon: 'https://img.csgo.com.cn/csgo/82/bb/82bbb711e3f041a6e043bdce1d98f5741568276051.jpg',
-          gameType: this.data.gameTypeList[this.data.gameTypeIndex],
+          gameType: this.data.gameTypeIndex,
           maxNum: this.data.maxNumList[this.data.maxNumIndex],
           startTime: this.data.startTime,
           creator_id: app.globalData.userInfo._id,

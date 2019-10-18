@@ -28,3 +28,7 @@ page {
 .form-label {
   margin-right: 30rpx;
 }
+
+.form-input {
+  height: 100%;
+}

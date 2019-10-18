@@ -4,6 +4,12 @@
   </view>
   <view class="form">
     <view class="form-item">
+      <view class="form-label">队名</view>
+      <view class="form-value">
+        <input class="form-input" value="{{teamName}}" bindinput="handleTeamNameInput" placeholder="请输入队名"></input>
+      </view>
+    </view>
+    <view class="form-item">
       <view class="form-label">游戏</view>
       <view class="form-value">
         <picker bindchange="bindTypeChange" value="{{gameTypeIndex}}" range="{{gameTypeList}}">
