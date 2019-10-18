@@ -55,9 +55,9 @@ Page({
       })
       //判断是否已在队伍
       const findParticipant = teamItem.participant.find(item => {
-        return item === app.globalData.userInfo._id
+        return item._id === app.globalData.userInfo._id
       });
-      if (!findParticipant) {
+      if (findParticipant) {
         wx.showToast({
           icon: 'none',
           title: '你已在此队伍中'
@@ -77,7 +77,7 @@ Page({
           .then(res => {
             if (res.result.code === 1000) {
               //本地修改队伍信息
-              teamItem.participant.push(app.globalData.userInfo._id);
+              teamItem.participant.push(app.globalData.userInfo);
               teamItem.joining = false;
               this.setData({
                 teamList
