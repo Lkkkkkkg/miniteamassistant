@@ -5,6 +5,7 @@ cloud.init({
 })
 exports.main = async(event, context) => {
   const wxContext = cloud.getWXContext()
+  console.log(111, wxContext.OPENID)
   return new Promise((resolve, reject) => {
     const db = cloud.database();
     db.collection('users')
@@ -16,9 +17,10 @@ exports.main = async(event, context) => {
         if (res.data.length === 0) { //未注册 
           const newUser = {
             ...event.userInfo,
-            ...{
-              teams: []
-            }
+            _openid: wxContext.OPENID,
+              ...{
+                teams: []
+              }
           }
           //注册新用户
           db.collection('users')
@@ -46,7 +48,7 @@ exports.main = async(event, context) => {
                 message: err.message
               })
             })
-        }else { //已注册
+        } else { //已注册
           resolve({
             code: 1000,
             data: {
