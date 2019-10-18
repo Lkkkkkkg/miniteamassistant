@@ -14,6 +14,7 @@
         <view wx:if="{{item.participant.length < item.maxNum}}" class="button-join" data-_id="{{item._id}}" bindtap="handleClickJoin">{{item.joining ? '加入中' :'加入'}}</view>
       </view>
     </view>
+    <view class="loading" wx:if="{{loading}}">加载中</view>
     <view class="button-add" bindtap="handleClickAdd">组</view>
     <dialog-login show="{{loginDialogShow}}" bind:closeLoginDialog="closeLoginDialog"></dialog-login>
   </view>

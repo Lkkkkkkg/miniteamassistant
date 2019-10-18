@@ -19,7 +19,6 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    console.log(getCurrentPages()[getCurrentPages().length - 2])
   },
   handleTeamNameInput(e) {
     this.setData({
@@ -75,7 +74,9 @@ Page({
             wx.setStorageSync('userInfo', app.globalData.userInfo);
             wx.navigateBack({
               success() {
-                getCurrentPages()[0].getTeamList();
+                setTimeout(()=>{
+                  wx.startPullDownRefresh()
+                },350);
               }
             });
           })

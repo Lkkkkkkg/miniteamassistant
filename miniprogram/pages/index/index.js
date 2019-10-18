@@ -7,7 +7,8 @@ Page({
    */
   data: {
     teamList: null,
-    loginDialogShow: false
+    loginDialogShow: false,
+    loading: true
   },
 
   /**
@@ -17,19 +18,24 @@ Page({
     this.getTeamList();
   },
   getTeamList() {
-    db.collection('teams')
-      .get()
-      .then(res => {
-        this.setData({
-          teamList: res.data
+    return new Promise((resolve, reject) => {
+      db.collection('teams')
+        .get()
+        .then(res => {
+          this.setData({
+            teamList: res.data,
+            loading: false
+          });
+          resolve(res);
         })
-      })
-      .catch(err => {
-        wx.showToast({
-          icon: 'none',
-          title: '查询记录失败'
+        .catch(err => {
+          wx.showToast({
+            icon: 'none',
+            title: '查询记录失败'
+          })
+          reject(err);
         })
-      })
+    })
   },
   closeLoginDialog() {
     this.setData({
@@ -145,7 +151,11 @@ Page({
   /**
    * 页面相关事件处理函数--监听用户下拉动作
    */
-  onPullDownRefresh: function() {},
+  onPullDownRefresh: function() {
+    this.getTeamList().then(()=>{
+      wx.stopPullDownRefresh();
+    })
+  },
 
   /**
    * 页面上拉触底事件的处理函数

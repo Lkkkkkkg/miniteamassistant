@@ -31,6 +31,10 @@
   border: 1rpx solid #ccc;
 }
 
+.loading {
+  text-align: center;
+}
+
 .button-join {
   width: 120rpx;
   height: 120rpx;
