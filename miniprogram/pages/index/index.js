@@ -20,6 +20,7 @@ Page({
   getTeamList() {
     return new Promise((resolve, reject) => {
       db.collection('teams')
+        .orderBy('createTime', 'desc') 
         .get()
         .then(res => {
           this.setData({
@@ -110,7 +111,7 @@ Page({
             });
             wx.showToast({
               icon: 'none',
-              title: err.message
+              title: err.result.message
             })
           })
       }
@@ -152,7 +153,7 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function() {
-    this.getTeamList().then(()=>{
+    this.getTeamList().then(() => {
       wx.stopPullDownRefresh();
     })
   },
