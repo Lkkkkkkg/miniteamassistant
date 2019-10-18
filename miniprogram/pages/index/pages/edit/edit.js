@@ -47,7 +47,7 @@ Page({
           maxNum: this.data.maxNumList[this.data.maxNumIndex],
           startTime: this.data.startTime,
           creator_id: app.globalData.userInfo._id,
-          participant: [app.globalData.userInfo._id]
+          participant: [app.globalData.userInfo]
         }
       })
       .then(res => {

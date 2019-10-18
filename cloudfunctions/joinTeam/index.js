@@ -6,18 +6,49 @@ exports.main = async(event, context) => {
   const wxContext = cloud.getWXContext()
   return new Promise((resolve, reject) => {
     const db = cloud.database();
-    console.log(event)
-    db.collection('teams').doc(event._id).update({
-        // data 传入需要局部更新的数据
-        data: {
-          participant: db.command.push(event.user_id)
+    db.collection('teams')
+      .where({
+        _id: event.team_id
+      })
+      .get()
+      .then(res => {
+        const teamItem = res.data[0];
+        if (teamItem.participant.length < teamItem.maxNum) { //小于最大人数允许加入
+          const p1 = db.collection('teams').doc(event.team_id).update({
+            data: {
+              participant: db.command.push(event.userInfo)
+            }
+          });
+          //用户添加参与队伍
+          const p2 = db.collection('users').doc(event.userInfo._id).update({
+            data: {
+              teams: db.command.push(event.team_id)
+            }
+          });
+          Promise.all([p1, p2]).then((res1, res2) => {
+              resolve({
+                code: 1000,
+                message: '加入队伍成功'
+              })
+            })
+            .catch((err1, err2) => {
+              reject({
+                code: 2000,
+                message: err1.message || err2.message
+              })
+            })
+        } else {
+          resolve ({
+            code: 1001,
+            message: '加入失败：队伍已满'
+          })
         }
       })
-      .then(res => {
-        resolve(res)
-      })
       .catch(err => {
-        reject(err)
+        reject ({
+          code: 2000,
+          message: err.message
+        })
       })
   })
 }

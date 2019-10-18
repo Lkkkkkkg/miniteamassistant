@@ -53,54 +53,58 @@ Page({
       const teamItem = teamList.find(item => {
         return item._id === e.currentTarget.dataset._id
       })
+      //判断是否已在队伍
       const findParticipant = teamItem.participant.find(item => {
         return item === app.globalData.userInfo._id
-      })
-      if (findParticipant) {
+      });
+      if (!findParticipant) {
         wx.showToast({
           icon: 'none',
-          title: '你已加入该队伍'
+          title: '你已在此队伍中'
         })
       } else {
         teamItem.joining = true;
         this.setData({
           teamList
         })
-        //队伍添加参队人员
-        const p1 = wx.cloud.callFunction({
-          name: 'joinTeam',
-          data: {
-            _id: e.currentTarget.dataset._id,
-            user_id: app.globalData.userInfo._id
-          }
-        });
-        //用户添加参与队伍
-        const p2 = db.collection('users').doc(app.globalData.userInfo._id).update({
-          data: {
-            teams: db.command.push(teamItem._id)
-          }
-        });
-        Promise.all([p1,p2])
+        wx.cloud.callFunction({
+            name: 'joinTeam',
+            data: {
+              team_id: e.currentTarget.dataset._id,
+              userInfo: app.globalData.userInfo
+            }
+          })
           .then(res => {
-            //本地数组添加组队人员
-            teamItem.participant.push(app.globalData.userInfo._id);
-            teamItem.joining = false;
-            this.setData({
-              teamList
-            })
-            wx.showToast({
-              icon: 'none',
-              title: '加入队伍成功'
-            })
+            if (res.result.code === 1000) {
+              //本地修改队伍信息
+              teamItem.participant.push(app.globalData.userInfo._id);
+              teamItem.joining = false;
+              this.setData({
+                teamList
+              });
+              //本地修改用户信息
+              app.globalData.userInfo.teams.push(e.currentTarget.dataset._id);
+              //缓存用户信息
+              wx.setStorageSync('userInfo', app.globalData.userInfo);
+              wx.showToast({
+                icon: 'none',
+                title: '加入队伍成功'
+              })
+            } else {
+              wx.showToast({
+                icon: 'none',
+                title: res.result.message
+              })
+            }
           })
           .catch(err => {
             teamItem.joining = false;
             this.setData({
               teamList
-            })
+            });
             wx.showToast({
               icon: 'none',
-              title: '更新记录失败'
+              title: err.message
             })
           })
       }
