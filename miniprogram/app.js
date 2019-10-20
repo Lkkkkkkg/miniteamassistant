@@ -12,9 +12,16 @@ App({
         env: 'release-tzaqh'
       })
     }
+    const updateManager = wx.getUpdateManager()
+    updateManager.onCheckForUpdate(function (res) {
+      // 请求完新版本信息的回调
+      if (res.hasUpdate) {
+        wx.clearStorage();
+      }
+    })
     let userInfo = wx.getStorageSync('userInfo') ? wx.getStorageSync('userInfo') : null
-    this.globalData = {
-      userInfo
+    this.globalData= {
+      userInfo: null
     }
   }
 })

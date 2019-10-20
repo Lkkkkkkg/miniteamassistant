@@ -1,0 +1,12 @@
+var formatTime = function(timeStamp) {
+  var time = getDate(timeStamp);
+  var hour = time.getHours();
+  var min = time.getMinutes();
+  hour = hour < 10 ? '0' + hour : hour;
+  min = min < 10 ? '0' + min : min;
+  return hour + ':' + min
+}
+
+module.exports = {
+  formatTime: formatTime
+}

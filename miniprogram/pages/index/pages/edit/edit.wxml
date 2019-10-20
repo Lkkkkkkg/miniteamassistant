@@ -4,40 +4,96 @@
   </view>
   <view class="form">
     <view class="form-item">
-      <view class="form-label">队名</view>
+      <view class="form-label">队伍名称</view>
       <view class="form-value">
         <input class="form-input" value="{{teamName}}" bindinput="handleTeamNameInput" placeholder="请输入队名"></input>
       </view>
     </view>
-    <view class="form-item">
-      <view class="form-label">游戏</view>
-      <view class="form-value">
-        <picker bindchange="bindTypeChange" value="{{gameTypeIndex}}" range="{{gameTypeList}}">
-          <view class="picker">
-            {{gameTypeList[gameTypeIndex]}}
-          </view>
-        </picker>
-      </view>
+    <view class="form-item" bindtap="showActivityTypePicker">
+      <view class="form-label">开黑类型</view>
+      <view class="form-value" wx:if="{{activityLoading}}">加载中</view>
+      <view class="form-value" wx:else>{{activityType !== null ? activityType : '请选择开黑类型'}}</view>
     </view>
-    <view class="form-item">
-      <view class="form-label">人数</view>
-      <view class="form-value">
-        <picker bindchange="bindMaxNumChange" value="{{maxNumIndex}}" range="{{maxNumList}}">
-          <view class="picker">
-            {{maxNumList[maxNumIndex]}}
-          </view>
-        </picker>
-      </view>
+    <view class="form-item" bindtap="showMaxNumPicker">
+      <view class="form-label">最大人数</view>
+      <view class="form-value" wx:if="{{maxNumLoading}}">加载中</view>
+      <view class="form-value" wx:else>{{activityType !== null ? (maxNum !== null ? maxNum : '请选择最大人数') : '请选择开黑类型'}}</view>
     </view>
-    <view class="form-item">
-      <view class="form-label">开始时间</view>
-      <view class="form-value">
-        <picker mode="time" value="{{startTime}}" start="00:00" end="23:59" bindchange="bindStartTimeChange">
-          <view class="picker">
-            {{startTime}}
-          </view>
-        </picker>
-      </view>
+    <view class="form-item" bindtap="showStartTimePicker">
+      <view class="form-label">开黑时段</view>
+      <view class="form-value">{{duration ? (days[duration[0][0]] + ' ' + hours[duration[0][1]] + '点' + mins[duration[0][2]] + '分' + '-' + days[duration[1][0]] + ' ' + hours[duration[1][1]] + '点' + mins[duration[1][2]] + '分') : '请选择开黑时段' }}</view>
+    </view>
+  </view>
+  <!-- 游戏picker -->
+  <view class="picker-wrap {{activityTypePickerShow?'show':''}}">
+    <view class="picker-header">
+      <view class="button-cancel" bindtap="closeActivityTypePicker">取消</view>
+      <view class="picker-title">游戏</view>
+      <view class="button-confirm" bindtap="confirmActivityType">确定</view>
+    </view>
+    <view class="picker-body">
+      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{activityTypeValue}}" bindchange="bindActivityTypeChange">
+        <picker-view-column>
+          <view wx:for="{{activityTypeList}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}</view>
+        </picker-view-column>
+      </picker-view>
+    </view>
+  </view>
+  <!-- 人数picker -->
+  <view class="picker-wrap {{maxNumPickerShow?'show':''}}">
+    <view class="picker-header">
+      <view class="button-cancel" bindtap="closeMaxNumPicker">取消</view>
+      <view class="picker-title">最大人数</view>
+      <view class="button-confirm" bindtap="confirmMaxNum">确定</view>
+    </view>
+    <view class="picker-body">
+      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{maxNumValue}}" bindchange="bindMaxNumChange">
+        <picker-view-column>
+          <view wx:for="{{maxNumList}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}</view>
+        </picker-view-column>
+      </picker-view>
+    </view>
+  </view>
+  <!-- 开始时间picker -->
+  <view class="picker-wrap {{startTimePickerShow?'show':''}}">
+    <view class="picker-header">
+      <view class="button-cancel" bindtap="closeStartTimePicker">取消</view>
+      <view class="picker-title">开始时间</view>
+      <view class="button-confirm" bindtap="handleClickNext">下一步</view>
+    </view>
+    <view class="picker-body">
+      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{startTimeValue}}" bindchange="bindStartTimeChange">
+        <picker-view-column>
+          <view wx:for="{{days}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view wx:for="{{hours}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}点</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view wx:for="{{mins}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}分</view>
+        </picker-view-column>
+      </picker-view>
+    </view>
+  </view>
+  <!-- 结束时间picker -->
+  <view class="picker-wrap {{endTimePickerShow?'show':''}}" style="z-index:1">
+    <view class="picker-header">
+      <view class="button-cancel" bindtap="handleClickBack">上一步</view>
+      <view class="picker-title">结束时间</view>
+      <view class="button-confirm" bindtap="confirmTime">确定</view>
+    </view>
+    <view class="picker-body">
+      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{endTimeValue}}" bindchange="bindEndTimeChange">
+        <picker-view-column>
+          <view wx:for="{{days}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view wx:for="{{hours}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}点</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view wx:for="{{mins}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}分</view>
+        </picker-view-column>
+      </picker-view>
     </view>
   </view>
 </view>

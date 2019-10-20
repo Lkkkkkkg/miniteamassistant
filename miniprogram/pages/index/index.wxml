@@ -1,20 +1,58 @@
+<wxs src="../../filters/filters.wxs" module="filters" />
+<wxs module="helper">
+  var isInside = function(arr, _id) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i]._id === _id) {
+        return true;
+      }
+    }
+    return false;
+  }
+  module.exports = {
+    isInside: isInside
+  }
+</wxs>
+
 <view class="page">
-  <view class="cards">
-    <view class="card" wx:for="{{teamList}}" wx:key="{{item._id}}">
-      <image class="card-img" src="{{item.gameIcon}}"></image>
-      <view class="card-content">
-        <view>{{item.teamName}}</view>
-        <view>预计开黑时间：{{item.startTime}}</view>
-        <view class="avatar-box">
-          <image class="avatar" wx:for="{{item.participant}}" src="{{item.avatarUrl}}" wx:key="{{item._id}}"></image>
+  <view class="page-header">
+    <view class="tabs">
+      <view class="tab {{dayType === 0 ? 'active' : ''}}" data-type="{{0}}" bindtap="handleClickTab">今天</view>
+      <view class="tab {{dayType === 1 ? 'active' : ''}}" data-type="{{1}}" bindtap="handleClickTab">明天</view>
+      <view class="tab {{dayType === 2 ? 'active' : ''}}" data-type="{{2}}" bindtap="handleClickTab">后天</view>
+    </view>
+  </view>
+  <view class="cards {{loading ? '' : 'show'}}">
+    <view class="card {{nowTime > item.endTime ? 'disabled' : ''}}" wx:for="{{teamList}}" wx:key="{{item._id}}" hidden="{{item.startTime < dayTimes[dayType] || item.startTime > dayTimes[dayType + 1]}}" style="border-color: {{nowTime > item.startTime ? '#449d44' : '#ec971f'}}">
+      <view class="card-tag" style="background-color: {{nowTime > item.startTime ? '#449d44' : '#ec971f'}}">开黑时段:{{filters.formatTime(item.startTime)}}-{{filters.formatTime(item.endTime)}}</view>
+      <view class="card-left">
+        <image mode="aspectFill" class="card-icon" src="{{item.activity.activityIcon}}"></image>
+        <view class="card-icon-des">{{item.activity.activityName}}</view>
+      </view>
+      <view class="card-mid">
+        <view class="card-title">{{item.teamName}}</view>
+        <view class="card-avatar-wrap">
+          <image class="card-avatar" wx:for="{{item.participant}}" src="{{item.avatarUrl}}" wx:key="{{item._id}}"></image>
         </view>
-        <view>{{item.participant.length}}/{{item.maxNum}} {{item.participant.length
-          < item.maxNum ? '等待中' : '已满员'}}</view>
-        </view>
-        <view wx:if="{{item.participant.length < item.maxNum}}" class="button-join" data-_id="{{item._id}}" bindtap="handleClickJoin">{{item.joining ? '加入中' :'加入'}}</view>
+      </view>
+      <view class="card-right">
+        <view class="card-status">{{nowTime > item.endTime ? '已结束' : (nowTime > item.startTime ? '开黑中':'等待中')}}</view>
+        <button wx:if="{{userInfo && helper.isInside(item.participant,userInfo._id)}}" class="card-button" hover-class="card-button-hover" data-item="{{item}}">
+          <view class="weui-loading" wx:if="{{item.joining}}"></view>
+          <view class="button-label" wx:else>退出队伍</view>
+        </button>
+        <button wx:else class="card-button" hover-class="card-button-hover" data-item="{{item}}" open-type="getUserInfo" bindgetuserinfo="handleClickJoin">
+          <view class="weui-loading" wx:if="{{item.joining}}"></view>
+          <view class="button-label" wx:else>加入队伍</view>
+        </button>
+        <view class="card-avatar-des">人数: {{item.participant.length}}/{{item.maxNum}}</view>
       </view>
     </view>
-    <view class="loading" wx:if="{{loading}}">加载中</view>
-    <view class="button-add" bindtap="handleClickAdd">组</view>
-    <dialog-login show="{{loginDialogShow}}" bind:closeLoginDialog="closeLoginDialog"></dialog-login>
   </view>
+  <view class="cards-tips">
+    <view class="weui-loading" wx:if="{{loading}}"></view>
+  </view>
+  <button class="button-add" open-type="getUserInfo" bindgetuserinfo="handleClickAdd">
+    <view class="weui-loading" wx:if="{{adding}}"></view>
+    <view class="button-label" wx:else>组</view>
+  </button>
+</view>
