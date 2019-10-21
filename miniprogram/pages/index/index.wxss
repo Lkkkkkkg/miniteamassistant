@@ -13,9 +13,41 @@
 .tab {
   padding: 0 26rpx;
   text-align: center;
-  font-size: 40rpx;
+  font-size: 34rpx;
   color: #333;
   transition: color 0.225s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.tab-0-hover {
+  color: #1ca2ff;
+}
+
+.tab-0-hover .tab-bar {
+  transform: translate3d(0, 0, 0) !important;
+}
+
+.tab-1-hover {
+  color: #1ca2ff;
+}
+
+.tab-1-hover .tab-bar {
+  transform: translate3d(120rpx, 0, 0) !important;
+}
+
+.tab-2-hover {
+  color: #1ca2ff;
+}
+
+.tab-2-hover .tab-bar {
+  transform: translate3d(240rpx, 0, 0) !important;
+}
+
+.tab-3-hover {
+  color: #1ca2ff;
+}
+
+.tab-3-hover .tab-bar {
+  transform: translate3d(360rpx, 0, 0) !important;
 }
 
 .tab-bar {
@@ -23,7 +55,7 @@
   left: 26rpx;
   bottom: -2rpx;
   height: 2rpx;
-  width: 80rpx;
+  width: 68rpx;
   background-color: #1ca2ff;
   z-index: 1;
   transition: transform 0.225s cubic-bezier(0.23, 1, 0.32, 1);
@@ -60,8 +92,6 @@
 .cards-tips {
   text-align: center;
 }
-
-
 
 .card-left {
   display: flex;
@@ -108,7 +138,7 @@
 }
 
 .card.wait {
- border-color: #ec971f;
+  border-color: #ec971f;
 }
 
 .card.wait .card-tag {
@@ -116,19 +146,19 @@
 }
 
 .card.work {
- border-color: #449d44;
+  border-color: #449d44;
 }
 
-.card.work .card-tag{
+.card.work .card-tag {
   background-color: #449d44;
 }
 
 .card.end {
- border-color: #aaa;
- opacity: .6;
+  border-color: #aaa;
+  opacity: 0.6;
 }
 
-.card.end .card-tag, .card.end .card-button{
+.card.end .card-tag, .card.end .card-button {
   background-color: #aaa;
 }
 
