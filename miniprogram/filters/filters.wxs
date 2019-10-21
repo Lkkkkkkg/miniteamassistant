@@ -1,10 +1,28 @@
 var formatTime = function(timeStamp) {
+  var nowTime = getDate();
   var time = getDate(timeStamp);
+  var diffDates = time.getDate() - nowTime.getDate();
+  var date = '';
   var hour = time.getHours();
   var min = time.getMinutes();
+  if (diffDates === 0) {
+    date = '今天'
+  } else if(diffDates === 1) {
+    date = '明天'
+  } else if (diffDates === 2) {
+    date = '后台'
+  } else if (diffDates >= 2) {
+    date = diffDates + '天后'
+  } else if (diffDates === -1) {
+    date = '昨天'
+  } else if (diffDates === -2) {
+    date = '前天'
+  } else {
+    date = -diffDates + '天前'
+  }
   hour = hour < 10 ? '0' + hour : hour;
   min = min < 10 ? '0' + min : min;
-  return hour + ':' + min
+  return date + ' ' + hour + ':' + min
 }
 
 module.exports = {

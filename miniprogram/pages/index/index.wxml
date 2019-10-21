@@ -8,22 +8,44 @@
     }
     return false;
   }
+  var boolStatus = function(startTime, endTime) {
+    var nowTime = getDate().getTime();
+    if (nowTime > endTime) {
+      return 2
+    } else if (nowTime >= startTime) {
+      return 1
+    } else {
+      return 0
+    }
+  }
   module.exports = {
-    isInside: isInside
+    isInside: isInside,
+    boolStatus: boolStatus
   }
 </wxs>
 
 <view class="page">
   <view class="page-header">
     <view class="tabs">
-      <view class="tab {{dayType === 0 ? 'active' : ''}}" data-type="{{0}}" bindtap="handleClickTab">今天</view>
-      <view class="tab {{dayType === 1 ? 'active' : ''}}" data-type="{{1}}" bindtap="handleClickTab">明天</view>
-      <view class="tab {{dayType === 2 ? 'active' : ''}}" data-type="{{2}}" bindtap="handleClickTab">后天</view>
+      <view class="tab-bar" style="transform: translate3D({{132 * dayType}}rpx,0,0)"></view>
+      <view class="tab {{dayType === 0 ? 'active' : ''}}" data-type="{{0}}" bindtap="handleClickTab">
+        <view class="tab-label">全部</view>
+      </view>
+      <view class="tab {{dayType === 1 ? 'active' : ''}}" data-type="{{1}}" bindtap="handleClickTab">
+        <view class="tab-label">今天</view>
+      </view>
+      <view class="tab {{dayType === 2 ? 'active' : ''}}" data-type="{{2}}" bindtap="handleClickTab">
+        <view class="tab-label">明天</view>
+      </view>
+      <view class="tab {{dayType === 3 ? 'active' : ''}}" data-type="{{3}}" bindtap="handleClickTab">
+        <view class="tab-label">后天</view>
+      </view>
     </view>
   </view>
-  <view class="cards {{loading ? '' : 'show'}}">
-    <view class="card {{nowTime > item.endTime ? 'disabled' : ''}}" wx:for="{{teamList}}" wx:key="{{item._id}}" hidden="{{item.startTime < dayTimes[dayType] || item.startTime > dayTimes[dayType + 1]}}" style="border-color: {{nowTime > item.startTime ? '#449d44' : '#ec971f'}}">
-      <view class="card-tag" style="background-color: {{nowTime > item.startTime ? '#449d44' : '#ec971f'}}">开黑时段:{{filters.formatTime(item.startTime)}}-{{filters.formatTime(item.endTime)}}</view>
+  <view class="cards {{loading ? '' : 'show'}} ">
+    <view class="card {{helper.boolStatus(item.startTime,item.endTime) === 0 ? 'wait' : ''}} {{helper.boolStatus(item.startTime,item.endTime) === 1 ? 'work' : ''}} {{helper.boolStatus(item.startTime,item.endTime) === 2 ? 'end' : ''}}" wx:for="{{teamListArr[dayType]}}"
+      wx:key="{{item._id}}">
+      <view class="card-tag">{{filters.formatTime(item.startTime)}} - {{filters.formatTime(item.endTime)}}</view>
       <view class="card-left">
         <image mode="aspectFill" class="card-icon" src="{{item.activity.activityIcon}}"></image>
         <view class="card-icon-des">{{item.activity.activityName}}</view>
@@ -35,12 +57,14 @@
         </view>
       </view>
       <view class="card-right">
-        <view class="card-status">{{nowTime > item.endTime ? '已结束' : (nowTime > item.startTime ? '开黑中':'等待中')}}</view>
+        <view class="card-status" wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 0}}">等待中</view>
+        <view class="card-status" wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 1}}">进行中</view>
+        <view class="card-status" wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 2}}">已结束</view>
         <button wx:if="{{userInfo && helper.isInside(item.participant,userInfo._id)}}" class="card-button" hover-class="card-button-hover" data-item="{{item}}">
           <view class="weui-loading" wx:if="{{item.joining}}"></view>
           <view class="button-label" wx:else>退出队伍</view>
         </button>
-        <button wx:else class="card-button" hover-class="card-button-hover" data-item="{{item}}" open-type="getUserInfo" bindgetuserinfo="handleClickJoin">
+        <button wx:else class="card-button" hover-class="card-button-hover" data-item="{{item}}" open-type="getUserInfo" bindgetuserinfo="handleClickJoin" disabled="{{helper.boolStatus(item.startTime,item.endTime) === 2}}">
           <view class="weui-loading" wx:if="{{item.joining}}"></view>
           <view class="button-label" wx:else>加入队伍</view>
         </button>

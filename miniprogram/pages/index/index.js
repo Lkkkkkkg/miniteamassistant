@@ -10,12 +10,10 @@ Page({
    */
   data: {
     userInfo: null,
-    teamList: null,
+    teamListArr: [null,null,null],
     loginDialogShow: false,
     loading: true,
-    dayType: 0,
-    nowTime: null,
-    dayTimes: null,
+    dayType: 1,
     adding: false
   },
 
@@ -32,22 +30,30 @@ Page({
     this.setData({
       dayType: e.currentTarget.dataset.type
     });
-    this.getTeamList();
+    if(!this.data.teamListArr[e.currentTarget.dataset.type]) {
+      this.setData({
+        loading: true
+      })
+      this.getTeamList();
+    }
   },
   getTeamList() {
-    const date = new Date();
-    const todayTime = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-    this.setData({
-      nowTime: date.getTime(),
-      dayTimes: [todayTime, todayTime + 86400000, todayTime + 172800000, todayTime + 259200000]
-    })
     return new Promise((resolve, reject) => {
+      const date = new Date();
+      const todayTime = new Date(date.getFullYear(), date.getMonth(),date.getDate(),0,0,0).getTime(); //今天的时间
+      const timeArr = [0, todayTime, todayTime + 86400000,todayTime + 172800000]
       db.collection('teams')
+        .where({
+          endTime: db.command.gt(timeArr[this.data.dayType])
+        })
         .orderBy('createTime', 'desc')
+        .orderBy('endTime', 'desc')
         .get()
         .then(res => {
+          const teamListArr = this.data.teamListArr;
+          teamListArr[this.data.dayType] = res.data;
           this.setData({
-            teamList: res.data,
+            teamListArr,
             loading: false
           });
           resolve(res);
@@ -92,13 +98,13 @@ Page({
   },
   joinTeam(e, userInfo) {
     if (e.currentTarget.dataset.item._id.joining) return;
-    const teamList = this.data.teamList;
-    const teamItem = teamList.find(item => {
+    const teamListArr = this.data.teamListArr;
+    const teamItem = teamListArr[this.data.dayType].find(item => {
       return item._id === e.currentTarget.dataset.item._id
     });
     teamItem.joining = true;
     this.setData({
-      teamList
+      teamListArr
     })
     wx.cloud.callFunction({
         name: 'joinTeam',
@@ -113,7 +119,7 @@ Page({
           teamItem.participant.push(app.globalData.userInfo);
           teamItem.joining = false;
           this.setData({
-            teamList
+            teamListArr
           });
           //本地修改用户信息
           app.globalData.userInfo.teams.push(e.currentTarget.dataset.item._id);
@@ -130,14 +136,14 @@ Page({
           });
           teamItem.joining = false;
           this.setData({
-            teamList
+            teamListArr
           });
         }
       })
       .catch(err => {
         teamItem.joining = false;
         this.setData({
-          teamList
+          teamListArr
         });
         wx.showToast({
           icon: 'none',
