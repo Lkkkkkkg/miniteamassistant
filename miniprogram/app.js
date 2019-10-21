@@ -21,7 +21,7 @@ App({
     })
     let userInfo = wx.getStorageSync('userInfo') ? wx.getStorageSync('userInfo') : null
     this.globalData= {
-      userInfo: null
+      userInfo
     }
   }
 })

@@ -17,12 +17,12 @@ const joinTeam = (team_id, userInfo, resolve, reject) => {
     }
   });
   Promise.all([p1, p2]).then((res2, res3) => {
-      resolve({
-        code: 1000,
-        data: {},
-        message: '加入队伍成功'
-      })
+    resolve({
+      code: 1000,
+      data: {},
+      message: '加入队伍成功'
     })
+  })
     .catch((err2, err3) => {
       reject({
         code: 2000,
@@ -31,8 +31,7 @@ const joinTeam = (team_id, userInfo, resolve, reject) => {
       })
     })
 }
-exports.main = async(event, context) => {
-
+exports.main = async (event, context) => {
   // 获取 WX Context (微信调用上下文)，包括 OPENID、APPID、及 UNIONID（需满足 UNIONID 获取条件）
   const wxContext = cloud.getWXContext()
   return new Promise((resolve, reject) => {
@@ -43,11 +42,17 @@ exports.main = async(event, context) => {
       })
       .get()
       .then(res => {
-        if (new Date().getTime() > res.data[0].endTime) { //判断活动是否过期
+        if(res.data.length === 0) {
+          resolve({
+            code: 1001,
+            data: {},
+            message: '队伍已解散'
+          })
+        }else if (new Date().getTime() > res.data[0].endTime) { //判断活动是否过期
           resolve({
             code: 1002,
             data: {},
-            message: '开黑已结束'
+            message: '活动已结束'
           })
         } else if (res.data[0].participant.length === res.data[0].maxNum) { //判断队伍是否已满
           resolve({
@@ -56,20 +61,16 @@ exports.main = async(event, context) => {
             message: '队伍已满'
           })
         } else {
-          console.log(event.userInfo.teams)
           if (event.userInfo.teams.length === 0) {
-            console.log(1)
             joinTeam(event.team_id, event.userInfo, resolve, reject)
           } else {
-         
-
             db.collection('teams')
               .where({
                 _id: event.userInfo.teams[event.userInfo.teams.length - 1]
               })
               .get()
               .then(res1 => { //判断用户是否已经加入一个队伍
-                if (new Date().getTime() <= res1.data[0].endTime) {
+                if (res1.data.length > 0 && new Date().getTime() <= res1.data[0].endTime) {
                   resolve({
                     code: 1004,
                     data: {},
@@ -91,7 +92,6 @@ exports.main = async(event, context) => {
         }
       })
       .catch(err => {
-        console.log(err)
         reject({
           code: 2000,
           data: {},

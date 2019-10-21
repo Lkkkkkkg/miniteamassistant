@@ -63,12 +63,16 @@
         <view class="card-status" wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 0}}">等待中</view>
         <view class="card-status" wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 1}}">进行中</view>
         <view class="card-status" wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 2}}">已结束</view>
-        <button wx:if="{{userInfo && helper.isInside(item.participant,userInfo._id)}}" class="card-button" hover-class="card-button-hover" data-item="{{item}}">
-          <view class="weui-loading" wx:if="{{item.joining}}"></view>
+        <button wx:if="{{userInfo && userInfo._id === item.creator_id}}" class="card-button" hover-class="card-button-hover" data-item="{{item}}" disabled="{{cardButtonLoading || helper.boolStatus(item.startTime,item.endTime) === 2}}" bindtap="disbandTeam">
+          <view class="weui-loading" wx:if="{{item.cardButtonLoading}}"></view>
+          <view class="button-label" wx:else>解散队伍</view>
+        </button>
+        <button wx:elif="{{userInfo && helper.isInside(item.participant,userInfo._id)}}" class="card-button" hover-class="card-button-hover" data-item="{{item}}" disabled="{{cardButtonLoading || helper.boolStatus(item.startTime,item.endTime) === 2}}" bindtap="quitTeam">
+          <view class="weui-loading" wx:if="{{item.cardButtonLoading}}"></view>
           <view class="button-label" wx:else>退出队伍</view>
         </button>
-        <button wx:else class="card-button" hover-class="card-button-hover" data-item="{{item}}" open-type="getUserInfo" bindgetuserinfo="handleClickJoin" disabled="{{helper.boolStatus(item.startTime,item.endTime) === 2}}">
-          <view class="weui-loading" wx:if="{{item.joining}}"></view>
+        <button wx:else class="card-button" hover-class="card-button-hover" data-item="{{item}}" open-type="getUserInfo" bindgetuserinfo="handleClickJoin" disabled="{{cardButtonLoading || helper.boolStatus(item.startTime,item.endTime) === 2}}">
+          <view class="weui-loading" wx:if="{{item.cardButtonLoading}}"></view>
           <view class="button-label" wx:else>加入队伍</view>
         </button>
         <view class="card-avatar-des">人数: {{item.participant.length}}/{{item.maxNum}}</view>

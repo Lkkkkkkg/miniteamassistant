@@ -9,8 +9,8 @@ Page({
    * 页面的初始数据
    */
   data: {
-    userInfo: null,
-    teamListArr: [null,null,null],
+    userInfo: app.globalData.userInfo,
+    teamListArr: [null, null, null, null],
     loginDialogShow: false,
     loading: true,
     dayType: 1,
@@ -21,16 +21,13 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    this.setData({
-      userInfo: app.globalData.userInfo
-    })
     this.getTeamList();
   },
   handleClickTab(e) {
     this.setData({
       dayType: e.currentTarget.dataset.type
     });
-    if(!this.data.teamListArr[e.currentTarget.dataset.type]) {
+    if (!this.data.teamListArr[e.currentTarget.dataset.type]) {
       this.setData({
         loading: true
       })
@@ -40,14 +37,14 @@ Page({
   getTeamList() {
     return new Promise((resolve, reject) => {
       const date = new Date();
-      const todayTime = new Date(date.getFullYear(), date.getMonth(),date.getDate(),0,0,0).getTime(); //今天的时间
-      const timeArr = [0, todayTime, todayTime + 86400000,todayTime + 172800000]
+      const todayTime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0).getTime(); //今天的时间
+      const timeArr = [0, todayTime, todayTime + 86400000, todayTime + 172800000]
       db.collection('teams')
         .where({
           endTime: db.command.gt(timeArr[this.data.dayType])
         })
-        .orderBy('createTime', 'desc')
         .orderBy('endTime', 'desc')
+        .orderBy('createTime', 'desc')
         .get()
         .then(res => {
           const teamListArr = this.data.teamListArr;
@@ -97,12 +94,10 @@ Page({
     }
   },
   joinTeam(e, userInfo) {
-    if (e.currentTarget.dataset.item._id.joining) return;
+    if (e.currentTarget.dataset.item._id.cardButtonLoading) return;
     const teamListArr = this.data.teamListArr;
-    const teamItem = teamListArr[this.data.dayType].find(item => {
-      return item._id === e.currentTarget.dataset.item._id
-    });
-    teamItem.joining = true;
+    const teamItem = teamListArr[this.data.dayType].find(item => item._id === e.currentTarget.dataset.item._id);
+    teamItem.cardButtonLoading = true;
     this.setData({
       teamListArr
     })
@@ -117,7 +112,7 @@ Page({
         if (res.result.code === 1000) {
           //本地修改队伍信息
           teamItem.participant.push(app.globalData.userInfo);
-          teamItem.joining = false;
+          teamItem.cardButtonLoading = false;
           this.setData({
             teamListArr
           });
@@ -134,20 +129,20 @@ Page({
             icon: 'none',
             title: res.result.message
           });
-          teamItem.joining = false;
+          teamItem.cardButtonLoading = false;
           this.setData({
             teamListArr
           });
         }
       })
       .catch(err => {
-        teamItem.joining = false;
+        teamItem.cardButtonLoading = false;
         this.setData({
           teamListArr
         });
         wx.showToast({
           icon: 'none',
-          title: err.result.message
+          title: err.message
         })
       })
   },
@@ -165,6 +160,102 @@ Page({
         this.joinTeam(e, e.detail.userInfo);
       }
     }
+  },
+  quitTeam(e) {
+    if (e.currentTarget.dataset.item._id.cardButtonLoading) return;
+    const teamListArr = this.data.teamListArr;
+    const teamItem = teamListArr[this.data.dayType].find(item => item._id === e.currentTarget.dataset.item._id);
+    teamItem.cardButtonLoading = true;
+    this.setData({
+      teamListArr
+    });
+    wx.cloud.callFunction({
+        name: 'quitTeam',
+        data: {
+          team_id: e.currentTarget.dataset.item._id,
+          userInfo: app.globalData.userInfo
+        }
+      })
+      .then(res => {
+        if (res.result.code === 1000) {
+          //本地修改队伍信息
+          const findParticipantIndex = teamItem.participant.findIndex(item => item._id === app.globalData.userInfo._id)
+          teamItem.participant.splice(findParticipantIndex, 1);
+          teamItem.cardButtonLoading = false;
+          this.setData({
+            teamListArr
+          });
+          //本地修改用户信息
+          app.globalData.userInfo.teams.pop();
+          //缓存用户信息
+          wx.setStorageSync('userInfo', app.globalData.userInfo);
+          wx.showToast({
+            icon: 'none',
+            title: '退出队伍成功'
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: res.result.message
+          });
+          teamItem.cardButtonLoading = false;
+          this.setData({
+            teamListArr
+          });
+        }
+      })
+      .catch(err => {
+        teamItem.cardButtonLoading = false;
+        this.setData({
+          teamListArr
+        });
+        wx.showToast({
+          icon: 'none',
+          title: err.message
+        })
+      })
+  },
+  disbandTeam(e) {
+    if (e.currentTarget.dataset.item._id.cardButtonLoading) return;
+    const teamListArr = this.data.teamListArr;
+    const teamItem = teamListArr[this.data.dayType].find(item => item._id === e.currentTarget.dataset.item._id);
+    teamItem.cardButtonLoading = true;
+    this.setData({
+      teamListArr
+    });
+    wx.cloud.callFunction({
+        name: 'disbandTeam',
+        data: {
+          team_id: e.currentTarget.dataset.item._id,
+          userInfo: app.globalData.userInfo
+        }
+      })
+      .then(res => {
+        if (res.result.code === 1000) {
+          teamItem.cardButtonLoading = false;
+          //本地修改队伍信息
+          const teamListArr = this.data.teamListArr;
+          const teamItemIndex = teamListArr[this.data.dayType].findIndex(item => item._id === e.currentTarget.dataset.item._id);
+          teamListArr[this.data.dayType].splice(teamItemIndex, 1);
+          this.setData({
+            teamListArr
+          });
+          wx.showToast({
+            icon: 'none',
+            title: '解散队伍成功'
+          })
+        }
+      })
+      .catch(err => {
+        teamItem.cardButtonLoading = false;
+        this.setData({
+          teamListArr
+        });
+        wx.showToast({
+          icon: 'none',
+          title: err.message
+        })
+      })
   },
   /**
    * 生命周期函数--监听页面初次渲染完成

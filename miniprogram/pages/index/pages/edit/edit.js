@@ -264,7 +264,7 @@ Page({
         })
         .get()
         .then(res => {
-          if (new Date().getTime() <= res.data[0].endTime) { //判断用户是否已经加入一个队伍
+          if (res.data.length > 0 && new Date().getTime() <= res.data[0].endTime) { //判断用户是否已经加入一个队伍
             wx.showToast({
               icon: 'none',
               title: '你已经加入了一个队伍'
@@ -277,6 +277,7 @@ Page({
           }
         })
         .catch(err => {
+          console.log(err)
           wx.showToast({
             icon: 'none',
             title: '查询记录失败'
