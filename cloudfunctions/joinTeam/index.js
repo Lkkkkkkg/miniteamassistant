@@ -32,36 +32,39 @@ const joinTeam = (event, teamItem, resolve, reject) => {
   });
 
   Promise.all([p1, p2]).then((res1, res2) => {
-      //发送模板消息
-      const {
-        OPENID
-      } = cloud.getWXContext();
-      const result = cloud.openapi.templateMessage.send({
-        touser: OPENID,
-        templateId: 'uX2BPyE1ljnsm762B0kIhs-3ULK19SL28YbykNzT0lw',
-        formId: event.formId,
-        page: 'pages/index/index',
-        data: {
-          keyword1: {
-            value: teamItem.teamName,
-          },
-          keyword2: {
-            value: teamItem.participant[0].nickName,
-          },
-          keyword3: {
-            value: teamItem.activity.activityName,
-          },
-          keyword4: {
-            value: `${formateTime(teamItem.startTime)} 至\n${formateTime(teamItem.endTime)}`,
-          },
-          keyword5: {
-            value: teamItem.maxNum,
-          },
-          keyword6: {
-            value: teamItem.remarks,
-          },
-        }
-      })
+      teamItem.participant.push(event.userInfo);
+      if (teamItem.participant.length === teamItem.maxNum) {
+        teamItem.participant.forEach(userInfo => {
+          console.log(userInfo._openid)
+          //发送模板消息
+          cloud.openapi.templateMessage.send({
+            touser: userInfo._openid,
+            templateId: 'uX2BPyE1ljnsm762B0kIhs-3ULK19SL28YbykNzT0lw',
+            formId: event.formId,
+            page: 'pages/index/index',
+            data: {
+              keyword1: {
+                value: teamItem.teamName,
+              },
+              keyword2: {
+                value: teamItem.participant[0].nickName,
+              },
+              keyword3: {
+                value: teamItem.activity.activityName,
+              },
+              keyword4: {
+                value: `${formateTime(teamItem.startTime)} 至\n${formateTime(teamItem.endTime)}`,
+              },
+              keyword5: {
+                value: teamItem.maxNum,
+              },
+              keyword6: {
+                value: teamItem.remarks,
+              },
+            }
+          })
+        })
+      }
       resolve({
         code: 1000,
         data: {},
@@ -69,7 +72,6 @@ const joinTeam = (event, teamItem, resolve, reject) => {
       })
     })
     .catch((err1, err2, err3) => {
-      console.log(err1)
       reject({
         code: 2000,
         data: {},
@@ -127,7 +129,6 @@ exports.main = async(event, context) => {
                 }
               })
               .catch(err1 => {
-                console.log(err1)
                 reject({
                   code: 2000,
                   data: {},
@@ -138,7 +139,6 @@ exports.main = async(event, context) => {
         }
       })
       .catch(err => {
-        console.log(err)
         reject({
           code: 2000,
           data: {},

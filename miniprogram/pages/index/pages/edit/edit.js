@@ -203,6 +203,10 @@ Page({
           app.globalData.userInfo.teams.push(res1._id);
           //缓存用户信息
           wx.setStorageSync('userInfo', app.globalData.userInfo);
+          wx.showToast({
+            icon: 'none',
+            title: '发起组队成功'
+          });
           wx.navigateBack({
             success() {
               setTimeout(() => {
