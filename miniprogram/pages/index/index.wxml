@@ -49,6 +49,7 @@
     <view class="card {{helper.boolStatus(item.startTime,item.endTime) === 0 ? 'wait' : ''}} {{helper.boolStatus(item.startTime,item.endTime) === 1 ? 'work' : ''}} {{helper.boolStatus(item.startTime,item.endTime) === 2 ? 'end' : ''}}" wx:for="{{teamListArr[dayType]}}"
       wx:key="{{item._id}}">
       <view class="card-header">
+        <image wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 2}}" class="card-disabled-icon" mode="widthFix" src="/images/overdue_icon.png"></image>
         <image class="card-icon" src="{{item.activity.activityIcon}}"></image>
         <view class="card-creator">
           <view class="card-icon-des">{{item.activity.activityName}}</view>
@@ -65,15 +66,15 @@
                 <image class="avatar-img" src="{{item.avatarUrl}}"></image>
               </view>
             </view>
-                 <view class="card-avatar-des">已有{{item.participant.length}}人在队伍中</view>
+            <view class="card-avatar-des">已有{{item.participant.length}}人在队伍中</view>
           </view>
-          <view class="card-content-right">
-            <button wx:if="{{userInfo && userInfo._id === item.creator_id}}  " class="card-button {{item.cardButtonLoading ? 'card-button-loading' : ''}}" hover-class="card-button-hover" data-item="{{item}}" disabled="{{cardButtonLoading || helper.boolStatus(item.startTime,item.endTime) === 2}}"
+          <form class="card-content-right" bindsubmit="submitTemplateMessageForm" report-submit>    
+            <button wx:if="{{userInfo && userInfo._id === item.creator_id}}" class="card-button {{item.cardButtonLoading ? 'card-button-loading' : ''}}" hover-class="card-button-hover" data-item="{{item}}" disabled="{{cardButtonLoading || helper.boolStatus(item.startTime,item.endTime) === 2}}"
               bindtap="disbandTeam">
               <view class="weui-loading" wx:if="{{item.cardButtonLoading}}"></view>
               <view class="button-label" wx:else>解散</view>
             </button>
-            <button wx:elif="{{userInfo && helper.isInside(item.participant,userInfo._id)}} " class="card-button {{item.cardButtonLoading ? 'card-button-loading' : ''}}" hover-class="card-button-hover" data-item="{{item}}" disabled="{{cardButtonLoading || helper.boolStatus(item.startTime,item.endTime) === 2}}"
+            <button wx:elif="{{userInfo && helper.isInside(item.participant,userInfo._id)}}" class="card-button {{item.cardButtonLoading ? 'card-button-loading' : ''}}" hover-class="card-button-hover" data-item="{{item}}" disabled="{{cardButtonLoading || helper.boolStatus(item.startTime,item.endTime) === 2}}"
               bindtap="quitTeam">
               <view class="weui-loading" wx:if="{{item.cardButtonLoading}}"></view>
               <view class="button-label" wx:else>退出</view>
@@ -82,12 +83,12 @@
               <view class="weui-loading" wx:if="{{item.cardButtonLoading}}"></view>
               <view class="button-label" wx:else>加入</view>
             </button>
-          </view>
+          </form>
         </view>
       </view>
       <view class="card-footer">
       </view>
-      <image wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 2}}" class="card-disabled-icon" mode="widthFix" src="/images/overdue_icon.png"></image>
+
     </view>
   </view>
   <!-- <view class="cards {{loading ? '' : 'show'}} ">
