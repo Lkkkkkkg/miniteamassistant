@@ -85,162 +85,149 @@
 
 .card {
   position: relative;
-  display: flex;
-  height: 210rpx;
-  background-color: #fff;
-  box-shadow: 0 0 20rpx #ccc;
   margin-bottom: 40rpx;
-  color: #333;
-  border-left: 4rpx solid #fff;
-}
-
-.cards-tips {
-  text-align: center;
-}
-
-.card-left {
-  display: flex;
-  margin: 0 32rpx;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.card-icon {
-  margin-top: 5rpx;
-  width: 120rpx;
-  height: 120rpx;
-  border: 1rpx solid #ccc;
-  border-radius: 1rpx;
-}
-
-.card-icon-des {
-  text-align: center;
-  font-size: 24rpx;
-  margin-top: 16rpx;
-}
-
-.card-mid {
-  overflow: hidden;
-  margin-bottom: 12rpx;
-  width: 318rpx;
-}
-
-.card-tag {
-  position: absolute;
-  top: -10rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-  color: #fff;
-  font-weight: bold;
-  font-size: 30rpx;
-  text-align: center;
-  max-width: auto;
-  white-space: pre-wrap;
-  width: 360rpx;
-  height: 60rpx;
-  line-height: 60rpx;
-  border-radius: 0 15rpx 0 15rpx;
-}
-
-.card.wait {
-  border-color: #ec971f;
-}
-
-.card.wait .card-tag {
-  background-color: #ec971f;
+  background-color: #fff;
+  border-top: 4rpx solid  #ec971f;
 }
 
 .card.work {
-  border-color: #449d44;
-}
-
-.card.work .card-tag {
-  background-color: #449d44;
+  border-color:  #449d44; 
 }
 
 .card.end {
-  border-color: #aaa;
-  opacity: 0.6;
+  opacity: .7;
+  border-color: #bbb;
 }
 
-.card.end .card-tag, .card.end .card-button {
-  background-color: #aaa;
+.card-header {
+  position: relative;
+  color: #fff;
+  height: 400rpx;
+}
+
+.card-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.card-time {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 30rpx;
+  line-height: 30rpx;
+  padding: 20rpx 40rpx;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.card-creator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding: 20rpx 40rpx;
+  display: flex;
+  align-items: center;
+  font-size: 36rpx;
+}
+
+.card-creator-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+
+.card-icon-des {
+  margin-left: auto;
+}
+
+.card-body {
+  padding: 12rpx 40rpx 20rpx;
 }
 
 .card-title {
-  margin-top: 69rpx;
-  font-weight: 30rpx;
+  font-size: 44rpx;
+  color: #333;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.card-avatar-wrap {
-  margin-top: 17rpx;
-  width: 318rpx;
+.card-content {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
-.card-avatar {
+.card-content-item {
+  display: flex;
+  color: #666;
+  align-items: center;
+  margin-top: 10rpx;
+}
+
+.card-item-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 20rpx;
+}
+
+.card-content-item {
+  display: flex;
+}
+
+.avatar-icon {
+  position: absolute;
+  width: 24rpx;
+  height: 24rpx;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -17rpx);
+}
+
+.avatar-wrap {
   position: relative;
-  flex-shrink: 0;
   width: 50rpx;
   height: 50rpx;
-  margin: 7rpx;
-  font-size: 0;
+  margin-right: 10rpx;
 }
 
-.card-avatar-icon {
-  width: 32rpx;
-  height: 32rpx;
-  position: absolute;
-  left: -1rpx;
-  top: -17rpx;
-  z-index: 1;
-}
-
-.card-avatar-img {
+.avatar-img {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   border: 1rpx solid #ccc;
 }
 
-.card-right {
-  margin-left: auto;
-}
-
-.card-status {
-  margin: 8rpx 14rpx 0 0;
-  font-size: 28rpx;
-  text-align: right;
-}
-
 .card-button {
-  margin-top: 20rpx;
-  border-radius: 0;
-  width: 170rpx;
-  height: 70rpx;
-  line-height: 70rpx;
-  color: #fff;
-  background-color: #1ca2ff;
+  flex: 0;
+  width: 186rpx;
+  height: 64rpx;
+  line-height: 64rpx;
   font-size: 0;
-  transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+  background-color: #1ca2ff;
+  color: #fff;
+  border-radius: 50rpx;
+  transition: opacity .45s cubic-bezier(.23,1,.32,1);
 }
 
-.card-button-hover {
-  transform: translate3d(10rpx, 0, 0);
+.card-button-hover,.card-button-loading {
+  opacity: .7;
 }
 
 .button-label {
-  font-size: 26rpx;
+  font-size: 30rpx;
 }
 
-.card-avatar-des {
-  font-size: 26rpx;
-  margin-top: 18rpx;
+.card-disabled-icon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+  width: 200rpx;
 }
 
 .loading {

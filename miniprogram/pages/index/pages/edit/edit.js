@@ -27,7 +27,7 @@ Page({
     startTimeValue: [0, date.getHours(), date.getMinutes()],
     endTimeValue: [0, date.getHours(), date.getMinutes()],
     duration: null,
-    remarks: null,
+    remarks: '',
     activity: null,
     submiting: false,
   },

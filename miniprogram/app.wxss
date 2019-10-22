@@ -1,5 +1,5 @@
 page {
-  background: #fff;
+  background: #f5f6f7;
 }
 
 button {
@@ -10,6 +10,7 @@ button {
 button::after {
   border: none;
 }
+
 
 /*!
  * WeUI v2.0.0 (https://github.com/weui/weui-wxss)
@@ -68,4 +69,5 @@ button::after {
 
 button[disabled] {
   color: #fff!important;
+  background-color: #1ca2ff!important;
 }
