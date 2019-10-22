@@ -149,6 +149,8 @@
 }
 
 .card-title {
+  width: 400rpx;
+
   font-size: 44rpx;
   color: #333;
   overflow: hidden;
@@ -163,6 +165,7 @@
 }
 
 .card-content-item {
+  width: 400rpx;
   display: flex;
   color: #666;
   align-items: center;
@@ -177,6 +180,7 @@
 
 .card-content-item {
   display: flex;
+  overflow: hidden;
 }
 
 .avatar-icon {
@@ -189,6 +193,7 @@
 }
 
 .avatar-wrap {
+  flex-shrink: 0;
   position: relative;
   width: 50rpx;
   height: 50rpx;
@@ -204,7 +209,7 @@
 
 .card-button {
   flex: 0;
-  width: 186rpx;
+  width: 172rpx;
   height: 64rpx;
   line-height: 64rpx;
   font-size: 0;
@@ -228,6 +233,16 @@
   top: 0;
   z-index: 1;
   width: 200rpx;
+}
+
+.card-avatar-des {
+  margin-top: 10rpx;
+  color: #aaa;
+  font-size: 25rpx;
+}
+
+.cards-tips {
+  text-align: center;
 }
 
 .loading {
