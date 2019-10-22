@@ -3,35 +3,81 @@ cloud.init({
   // API 调用都保持和云函数当前所在环境一致
   env: cloud.DYNAMIC_CURRENT_ENV
 });
-const joinTeam = (team_id, userInfo, resolve, reject) => {
+const formateTime = (time) => {
+  const date = new Date(time);
+  let year = date.getFullYear(),
+    month = date.getMonth() + 1,
+    day = date.getDate(),
+    hour = date.getHours(),
+    min = date.getMinutes();
+  month = month < 10 ? '0' + month : month;
+  day = day < 10 ? '0' + day : day;
+  hour = hour < 10 ? '0' + hour : hour;
+  min = min < 10 ? '0' + min : min;
+
+  return `${year}-${month}-${day} ${hour}:${min}`
+}
+const joinTeam = (event, teamItem, resolve, reject) => {
   const db = cloud.database();
-  const p1 = db.collection('teams').doc(team_id).update({
+  const p1 = db.collection('teams').doc(event.team_id).update({
     data: {
-      participant: db.command.push(userInfo)
+      participant: db.command.push(event.userInfo)
     }
   });
   //用户添加参与队伍
-  const p2 = db.collection('users').doc(userInfo._id).update({
+  const p2 = db.collection('users').doc(event.userInfo._id).update({
     data: {
-      teams: db.command.push(team_id)
+      teams: db.command.push(event.team_id)
     }
   });
-  Promise.all([p1, p2]).then((res2, res3) => {
-    resolve({
-      code: 1000,
-      data: {},
-      message: '加入队伍成功'
+
+  Promise.all([p1, p2]).then((res1, res2) => {
+      //发送模板消息
+      const {
+        OPENID
+      } = cloud.getWXContext();
+      const result = cloud.openapi.templateMessage.send({
+        touser: OPENID,
+        templateId: 'uX2BPyE1ljnsm762B0kIhs-3ULK19SL28YbykNzT0lw',
+        formId: event.formId,
+        page: 'pages/index/index',
+        data: {
+          keyword1: {
+            value: teamItem.teamName,
+          },
+          keyword2: {
+            value: teamItem.participant[0].nickName,
+          },
+          keyword3: {
+            value: teamItem.activity.activityName,
+          },
+          keyword4: {
+            value: `${formateTime(teamItem.startTime)} 至\n${formateTime(teamItem.endTime)}`,
+          },
+          keyword5: {
+            value: teamItem.maxNum,
+          },
+          keyword6: {
+            value: teamItem.remarks,
+          },
+        }
+      })
+      resolve({
+        code: 1000,
+        data: {},
+        message: '加入队伍成功'
+      })
     })
-  })
-    .catch((err2, err3) => {
+    .catch((err1, err2, err3) => {
+      console.log(err1)
       reject({
         code: 2000,
         data: {},
-        message: err2 || err3
+        message: err1 || err2
       })
     })
 }
-exports.main = async (event, context) => {
+exports.main = async(event, context) => {
   // 获取 WX Context (微信调用上下文)，包括 OPENID、APPID、及 UNIONID（需满足 UNIONID 获取条件）
   const wxContext = cloud.getWXContext()
   return new Promise((resolve, reject) => {
@@ -42,13 +88,13 @@ exports.main = async (event, context) => {
       })
       .get()
       .then(res => {
-        if(res.data.length === 0) {
+        if (res.data.length === 0) {
           resolve({
             code: 1001,
             data: {},
             message: '队伍已解散'
           })
-        }else if (new Date().getTime() > res.data[0].endTime) { //判断活动是否过期
+        } else if (new Date().getTime() > res.data[0].endTime) { //判断活动是否过期
           resolve({
             code: 1002,
             data: {},
@@ -62,7 +108,7 @@ exports.main = async (event, context) => {
           })
         } else {
           if (event.userInfo.teams.length === 0) {
-            joinTeam(event.team_id, event.userInfo, resolve, reject)
+            joinTeam(event, res.data[0], resolve, reject)
           } else {
             db.collection('teams')
               .where({
@@ -77,7 +123,7 @@ exports.main = async (event, context) => {
                     message: '你已经加入了一个队伍'
                   })
                 } else {
-                  joinTeam(event.team_id, event.userInfo, resolve, reject)
+                  joinTeam(event, res.data[0], resolve, reject)
                 }
               })
               .catch(err1 => {
@@ -92,6 +138,7 @@ exports.main = async (event, context) => {
         }
       })
       .catch(err => {
+        console.log(err)
         reject({
           code: 2000,
           data: {},

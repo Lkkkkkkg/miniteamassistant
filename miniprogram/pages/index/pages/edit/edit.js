@@ -27,6 +27,7 @@ Page({
     startTimeValue: [0, date.getHours(), date.getMinutes()],
     endTimeValue: [0, date.getHours(), date.getMinutes()],
     duration: null,
+    remarks: null,
     activity: null,
     submiting: false,
   },
@@ -59,6 +60,11 @@ Page({
   handleTeamNameInput(e) {
     this.setData({
       teamName: e.detail.value
+    })
+  },
+  handleRemarksInput(e) {
+    this.setData({
+      remarks: e.detail.value
     })
   },
   showActivityTypePicker() {
@@ -184,6 +190,7 @@ Page({
         startTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[0][0], this.data.duration[0][1], this.data.duration[0][2]).getTime(),
         endTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[1][0], this.data.duration[1][1], this.data.duration[1][2]).getTime(),
         participant: [app.globalData.userInfo],
+        remarks: this.data.remarks
       }
     })
       .then(res1 => {

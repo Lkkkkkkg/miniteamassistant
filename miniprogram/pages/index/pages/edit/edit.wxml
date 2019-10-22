@@ -23,6 +23,12 @@
       <view class="form-label">开黑时段</view>
       <view class="form-value">{{duration ? (days[duration[0][0]] + ' ' + hours[duration[0][1]] + '点' + mins[duration[0][2]] + '分' + '-' + days[duration[1][0]] + ' ' + hours[duration[1][1]] + '点' + mins[duration[1][2]] + '分') : '请选择开黑时段' }}</view>
     </view>
+    <view class="form-item">
+      <view class="form-label">备注信息</view>
+      <view class="form-value">
+        <input class="form-input" value="{{remarks}}" bindinput="handleRemarksInput" placeholder="请填写备注"></input>
+      </view>
+    </view>
   </view>
   <!-- 游戏picker -->
   <view class="picker-wrap {{activityTypePickerShow?'show':''}}">

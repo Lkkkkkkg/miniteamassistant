@@ -1,7 +1,12 @@
 .page-header {
-  margin: 0 30rpx;
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  padding: 0 30rpx;
   height: 100rpx;
   line-height: 100rpx;
+  background-color: #fff;
 }
 
 .tabs {
@@ -179,11 +184,27 @@
 }
 
 .card-avatar {
+  position: relative;
   flex-shrink: 0;
   width: 50rpx;
   height: 50rpx;
-  border-radius: 50%;
   margin: 7rpx;
+  font-size: 0;
+}
+
+.card-avatar-icon {
+  width: 32rpx;
+  height: 32rpx;
+  position: absolute;
+  left: -1rpx;
+  top: -17rpx;
+  z-index: 1;
+}
+
+.card-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   border: 1rpx solid #ccc;
 }
 
@@ -236,13 +257,13 @@
   height: 100rpx;
   line-height: 100rpx;
   text-align: center;
-  background-color: #1ca2ff;
+  background-color: #fff;
   border-radius: 50%;
   box-shadow: 0 0 5rpx #bbb;
-  color: #fff;
   font-size: 0;
 }
 
-.button-add .button-label {
-  font-size: 36rpx;
+.button-add-icon {
+  width: 100rpx;
+  height: 100rpx;
 }

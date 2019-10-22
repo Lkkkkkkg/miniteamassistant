@@ -105,7 +105,8 @@ Page({
         name: 'joinTeam',
         data: {
           team_id: e.currentTarget.dataset.item._id,
-          userInfo: app.globalData.userInfo
+          userInfo: app.globalData.userInfo,
+          formId: this.formId
         }
       })
       .then(res => {
@@ -160,6 +161,9 @@ Page({
         this.joinTeam(e, e.detail.userInfo);
       }
     }
+  },
+  submitTemplateMessageForm(e) {
+    this.formId = e.detail.formId;
   },
   quitTeam(e) {
     if (e.currentTarget.dataset.item._id.cardButtonLoading) return;
