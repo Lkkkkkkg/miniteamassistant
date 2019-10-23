@@ -50,7 +50,7 @@
       wx:key="{{item._id}}">
       <view class="card-header">
         <image wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 2}}" class="card-disabled-icon" mode="widthFix" src="/images/overdue_icon.png"></image>
-        <image class="card-icon" src="{{item.activity.activityIcon}}"></image>
+        <image mode="widthFix" class="card-icon" src="{{item.activity.activityIcon}}"></image>
         <view class="card-creator">
           <view class="card-icon-des">{{item.activity.activityName}}</view>
         </view>
