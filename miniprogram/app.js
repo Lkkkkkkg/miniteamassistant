@@ -15,11 +15,17 @@ App({
     const updateManager = wx.getUpdateManager()
     updateManager.onCheckForUpdate(function (res) {
       // 请求完新版本信息的回调
+      console.log(res.hasUpdate)
       if (res.hasUpdate) {
         wx.clearStorage();
         wx.showToast({
           icon: 'none',
-          title: '版本已更新'
+          title: '版本已更新: 1.0.9'
+        })
+      }else {
+        wx.showToast({
+          icon: 'none',
+          title: '当前版本号: 1.0.9'
         })
       }
     })

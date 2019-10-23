@@ -66,7 +66,8 @@
                 <image class="avatar-img" src="{{item.avatarUrl}}"></image>
               </view>
             </view>
-            <view class="card-avatar-des">已有{{item.participant.length}}人在队伍中</view>
+                 <view class="card-avatar-des" wx:if="{{item.maxNum  === item.participant.length}}">已有{{item.participant.length}}人在队伍中, 暂无空位</view>
+            <view class="card-avatar-des" wx:else>已有{{item.participant.length}}人在队伍中, 剩余{{item.maxNum - item.participant.length}}个空位</view>
           </view>
           <form class="card-content-right" bindsubmit="submitTemplateMessageForm" report-submit>    
             <button wx:if="{{userInfo && userInfo._id === item.creator_id}}" class="card-button {{item.cardButtonLoading ? 'card-button-loading' : ''}}" hover-class="card-button-hover" data-item="{{item}}" disabled="{{cardButtonLoading || helper.boolStatus(item.startTime,item.endTime) === 2}}"
