@@ -165,7 +165,7 @@ Page({
     })
   },
   confirmTime() {
-    if ((this.data.endTimeValue[0] * 1440 + this.data.endTimeValue[1] * 60 + this.data.endTimeValue[2]) < (this.data.startTimeValue[0] * 1440 + this.data.startTimeValue[1] * 60 + this.data.startTimeValue[2])) {
+    if ((this.data.endTimeValue[0] * 1440 + this.data.endTimeValue[1] * 60 + this.data.endTimeValue[2]) <= (this.data.startTimeValue[0] * 1440 + this.data.startTimeValue[1] * 60 + this.data.startTimeValue[2])) {
       wx.showToast({
         icon: 'none',
         title: '结束时间必须大于开始时间'
@@ -203,10 +203,6 @@ Page({
           app.globalData.userInfo.teams.push(res1._id);
           wx.navigateBack({
             success() {
-              wx.showToast({
-                icon: 'none',
-                title: '发起组队成功'
-              });
               setTimeout(() => {
                 wx.startPullDownRefresh()
               }, 350);
@@ -214,6 +210,9 @@ Page({
           });
         })
           .catch(err1 => {
+            this.setData({
+              submiting: false
+            })
             wx.showToast({
               icon: 'none',
               title: '更新记录失败'
@@ -221,14 +220,12 @@ Page({
           })
       })
       .catch(err => {
+        this.setData({
+          submiting: false
+        })
         wx.showToast({
           icon: 'none',
           title: '添加记录失败'
-        })
-      })
-      .finally(() => {
-        this.setData({
-          submiting: false
         })
       })
   },
@@ -286,6 +283,7 @@ Page({
           }
         })
         .catch(err => {
+          console.log(1)
           console.log(err)
           wx.showToast({
             icon: 'none',

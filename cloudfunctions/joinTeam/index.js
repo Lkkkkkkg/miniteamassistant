@@ -32,10 +32,10 @@ const joinTeam = (event, teamItem, resolve, reject) => {
   });
 
   Promise.all([p1, p2]).then((res1, res2) => {
+    console.log(event);
       teamItem.participant.push(event.userInfo);
       if (teamItem.participant.length === teamItem.maxNum) {
         teamItem.participant.forEach(userInfo => {
-          console.log(userInfo._openid)
           //发送模板消息
           cloud.openapi.templateMessage.send({
             touser: userInfo._openid,
