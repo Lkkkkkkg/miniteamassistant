@@ -32,39 +32,38 @@ const joinTeam = (event, teamItem, resolve, reject) => {
   });
 
   Promise.all([p1, p2]).then((res1, res2) => {
-    console.log(event);
-      teamItem.participant.push(event.userInfo);
-      if (teamItem.participant.length === teamItem.maxNum) {
-        teamItem.participant.forEach(userInfo => {
-          //发送模板消息
-          cloud.openapi.templateMessage.send({
-            touser: userInfo._openid,
-            templateId: 'uX2BPyE1ljnsm762B0kIhs-3ULK19SL28YbykNzT0lw',
-            formId: event.formId,
-            page: 'pages/index/index',
-            data: {
-              keyword1: {
-                value: teamItem.teamName,
-              },
-              keyword2: {
-                value: teamItem.participant[0].nickName,
-              },
-              keyword3: {
-                value: teamItem.activity.activityName,
-              },
-              keyword4: {
-                value: `${formateTime(teamItem.startTime)} 至\n${formateTime(teamItem.endTime)}`,
-              },
-              keyword5: {
-                value: teamItem.maxNum,
-              },
-              keyword6: {
-                value: teamItem.remarks,
-              },
-            }
-          })
-        })
-      }
+      // teamItem.participant.push(event.userInfo);
+      // if (teamItem.participant.length === teamItem.maxNum) {
+      //   teamItem.participant.forEach(userInfo => {
+      //     //发送模板消息
+      //     cloud.openapi.templateMessage.send({
+      //       touser: userInfo._openid,
+      //       templateId: 'uX2BPyE1ljnsm762B0kIhs-3ULK19SL28YbykNzT0lw',
+      //       formId: event.formId,
+      //       page: 'pages/index/index',
+      //       data: {
+      //         keyword1: {
+      //           value: teamItem.teamName,
+      //         },
+      //         keyword2: {
+      //           value: teamItem.participant[0].nickName,
+      //         },
+      //         keyword3: {
+      //           value: teamItem.activity.activityName,
+      //         },
+      //         keyword4: {
+      //           value: `${formateTime(teamItem.startTime)} 至\n${formateTime(teamItem.endTime)}`,
+      //         },
+      //         keyword5: {
+      //           value: teamItem.maxNum,
+      //         },
+      //         keyword6: {
+      //           value: teamItem.remarks,
+      //         },
+      //       }
+      //     })
+      //   })
+      // }
       resolve({
         code: 1000,
         data: {},
