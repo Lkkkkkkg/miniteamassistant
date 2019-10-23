@@ -201,9 +201,6 @@ Page({
         }).then(res2 => {
           //本地修改用户信息
           app.globalData.userInfo.teams.push(res1._id);
-          //缓存用户信息
-          wx.setStorageSync('userInfo', app.globalData.userInfo);
-        
           wx.navigateBack({
             success() {
               wx.showToast({

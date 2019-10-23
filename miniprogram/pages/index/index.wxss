@@ -11,12 +11,12 @@
 
 .tabs {
   position: relative;
-  border-bottom: 1rpx solid #ccc;
   display: inline-flex;
+  border-bottom: 2rpx solid #ccc;
 }
 
 .tab {
-  padding: 0 26rpx;
+  width: 60px;
   text-align: center;
   font-size: 34rpx;
   color: #333;
@@ -57,10 +57,10 @@
 
 .tab-bar {
   position: absolute;
-  left: 26rpx;
+  left: 14px;
   bottom: -2rpx;
-  height: 2rpx;
-  width: 68rpx;
+  height: 4rpx;
+  width: 34px;
   background-color: #1ca2ff;
   z-index: 1;
   transition: transform 0.225s cubic-bezier(0.23, 1, 0.32, 1);

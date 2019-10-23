@@ -15,9 +15,7 @@ App({
     const updateManager = wx.getUpdateManager()
     updateManager.onCheckForUpdate(function (res) {
       // 请求完新版本信息的回调
-      console.log(res.hasUpdate)
       if (res.hasUpdate) {
-        wx.clearStorage();
         wx.showToast({
           icon: 'none',
           title: '版本已更新: 1.0.9'
@@ -29,9 +27,8 @@ App({
         })
       }
     })
-    let userInfo = wx.getStorageSync('userInfo') ? wx.getStorageSync('userInfo') : null
     this.globalData= {
-      userInfo
+      userInfo: null
     }
   }
 })
