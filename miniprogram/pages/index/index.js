@@ -22,7 +22,6 @@ Page({
    */
   onLoad: function(options) {
     this.getTeamList();
-    console.log(app.globalData.userInfo)
   },
   handleClickTab(e) {
     this.setData({

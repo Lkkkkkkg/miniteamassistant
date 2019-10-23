@@ -87,15 +87,15 @@
   position: relative;
   margin-bottom: 40rpx;
   background-color: #fff;
-  border-top: 4rpx solid  #ec971f;
+  border-top: 4rpx solid #ec971f;
 }
 
 .card.work {
-  border-color:  #449d44; 
+  border-color: #449d44;
 }
 
 .card.end {
-  opacity: .7;
+  opacity: 0.6;
   border-color: #bbb;
 }
 
@@ -130,7 +130,6 @@
   padding: 20rpx 40rpx;
   display: flex;
   align-items: center;
-  font-size: 36rpx;
 }
 
 .card-creator-avatar {
@@ -150,7 +149,6 @@
 
 .card-title {
   width: 400rpx;
-
   font-size: 44rpx;
   color: #333;
   overflow: hidden;
@@ -216,11 +214,11 @@
   background-color: #1ca2ff;
   color: #fff;
   border-radius: 50rpx;
-  transition: opacity .45s cubic-bezier(.23,1,.32,1);
+  transition: opacity 0.45s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.card-button-hover,.card-button-loading {
-  opacity: .7;
+.card-button-hover, .card-button-loading {
+  opacity: 0.6;
 }
 
 .button-label {
@@ -231,7 +229,7 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
   z-index: 1;
   width: 200rpx;
 }
@@ -264,9 +262,21 @@
   border-radius: 50%;
   box-shadow: 0 0 5rpx #bbb;
   font-size: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.45s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .button-add-icon {
-  width: 100rpx;
-  height: 100rpx;
+  width: 70rpx;
+  height: 70rpx;
+}
+
+.button-add-hover {
+  background-color: #f5f6f7;
+}
+
+.button-add-loading {
+  background-color: #f5f6f7;
 }

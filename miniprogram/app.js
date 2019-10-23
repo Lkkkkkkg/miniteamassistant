@@ -17,10 +17,13 @@ App({
       // 请求完新版本信息的回调
       if (res.hasUpdate) {
         wx.clearStorage();
+        wx.showToast({
+          icon: 'none',
+          title: '版本已更新'
+        })
       }
     })
     let userInfo = wx.getStorageSync('userInfo') ? wx.getStorageSync('userInfo') : null
-    console.log(userInfo)
     this.globalData= {
       userInfo
     }
