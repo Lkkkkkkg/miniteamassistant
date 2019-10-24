@@ -81,6 +81,12 @@ Page({
         })
     })
   },
+  handleClickCard() {
+    wx.showToast({
+      icon: 'none',
+      title: '详情页开发中'
+    })
+  },
   handleClickAdd(e) {
     if (e.detail.userInfo) {
       if (!app.globalData.userInfo) { //未登录
@@ -108,7 +114,6 @@ Page({
   },
   joinTeam(e, userInfo) {
     if (e.currentTarget.dataset.item._id.cardButtonLoading) return;
-    console.log(1);
     const teamListArr = this.data.teamListArr;
     const teamItem = teamListArr[this.data.dayType].find(item => item._id === e.currentTarget.dataset.item._id);
     teamItem.cardButtonLoading = true;
