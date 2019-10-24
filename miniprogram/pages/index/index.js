@@ -9,19 +9,36 @@ Page({
    * 页面的初始数据
    */
   data: {
-    userInfo: app.globalData.userInfo,
+    userInfo: null,
     teamListArr: [null, null, null, null],
     loginDialogShow: false,
     loading: true,
     dayType: 1,
-    adding: false
+    adding: false,
+    logining: true
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
+    this.autoLogin();
     this.getTeamList();
+  },
+  autoLogin() {
+    login(0)
+      .then((res) => {
+          if(res.result.code === 1000) {
+            this.setData({
+              userInfo: res.result.data.userInfo,
+              logining: false
+            })
+          }else {
+            this.setData({
+              logining: false
+            })
+          }
+      })
   },
   handleClickTab(e) {
     this.setData({
@@ -64,24 +81,20 @@ Page({
         })
     })
   },
-  closeLoginDialog() {
-    this.setData({
-      loginDialogShow: false
-    })
-  },
   handleClickAdd(e) {
     if (e.detail.userInfo) {
       if (!app.globalData.userInfo) { //未登录
         this.setData({
           adding: true
         })
-        login(e.detail.userInfo)
+        login(1,e.detail.userInfo)
           .then((res) => {
             wx.navigateTo({
               url: './pages/edit/edit',
               success: (() => {
                 this.setData({
-                  adding: false
+                  adding: false,
+                  userInfo: res.result.data.userInfo
                 })
               })
             })
@@ -95,6 +108,7 @@ Page({
   },
   joinTeam(e, userInfo) {
     if (e.currentTarget.dataset.item._id.cardButtonLoading) return;
+    console.log(1);
     const teamListArr = this.data.teamListArr;
     const teamItem = teamListArr[this.data.dayType].find(item => item._id === e.currentTarget.dataset.item._id);
     teamItem.cardButtonLoading = true;
@@ -119,8 +133,6 @@ Page({
           });
           //本地修改用户信息
           app.globalData.userInfo.teams.push(e.currentTarget.dataset.item._id);
-          //缓存用户信息
-          wx.setStorageSync('userInfo', app.globalData.userInfo);
           wx.showToast({
             icon: 'none',
             title: '加入队伍成功'
@@ -150,7 +162,7 @@ Page({
   handleClickJoin(e) {
     if (e.detail.userInfo) {
       if (!app.globalData.userInfo) {
-        login(e.detail.userInfo)
+        login(1,e.detail.userInfo)
           .then((res) => {
             this.setData({
               userInfo: app.globalData.userInfo
@@ -191,8 +203,6 @@ Page({
           });
           //本地修改用户信息
           app.globalData.userInfo.teams.pop();
-          //缓存用户信息
-          wx.setStorageSync('userInfo', app.globalData.userInfo);
           wx.showToast({
             icon: 'none',
             title: '退出队伍成功'

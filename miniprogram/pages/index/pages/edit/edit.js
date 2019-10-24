@@ -1,13 +1,13 @@
 const app = getApp();
 const db = wx.cloud.database();
 const date = new Date();
-
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
+    userInfo: null,
     teamName: '',
     activityLoading: true,
     activityTypePickerShow: false,
@@ -36,6 +36,10 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
+   
+   this.setData({
+     userInfo: app.globalData.userInfo
+   })
     this.getActivity();
   },
   getActivity() {
@@ -165,7 +169,7 @@ Page({
     })
   },
   confirmTime() {
-    if ((this.data.endTimeValue[0] * 1440 + this.data.endTimeValue[1] * 60 + this.data.endTimeValue[2]) < (this.data.startTimeValue[0] * 1440 + this.data.startTimeValue[1] * 60 + this.data.startTimeValue[2])) {
+    if ((this.data.endTimeValue[0] * 1440 + this.data.endTimeValue[1] * 60 + this.data.endTimeValue[2]) <= (this.data.startTimeValue[0] * 1440 + this.data.startTimeValue[1] * 60 + this.data.startTimeValue[2])) {
       wx.showToast({
         icon: 'none',
         title: '结束时间必须大于开始时间'
@@ -236,32 +240,7 @@ Page({
       })
   },
   submit() {
-    if (this.data.teamName.length < 5) {
-      wx.showToast({
-        icon: 'none',
-        title: '队伍名字不能少于5个字'
-      });
-      return;
-    }
-    if (!this.data.activityType) {
-      wx.showToast({
-        icon: 'none',
-        title: '请选择开黑类型'
-      });
-      return;
-    }
-    if (!this.data.maxNum) {
-      wx.showToast({
-        icon: 'none',
-        title: '请选择最大人数'
-      });
-      return;
-    }
-    if (!this.data.duration) {
-      wx.showToast({
-        icon: 'none',
-        title: '请选择开黑时段'
-      });
+    if (this.data.submiting || this.data.teamName === 0 || this.data.activityType === null || this.data.maxNum === null || this.data.duration === null) {
       return;
     }
     this.setData({

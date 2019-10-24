@@ -29,19 +29,19 @@
     <view class="tabs">
       <view class="tab {{dayType === 0 ? 'active' : ''}}" data-type="{{0}}" hover-class="tab-0-hover" bindtap="handleClickTab">
         <view class="tab-label">全部</view>
-        <view class="tab-bar" style="transform: translate3D({{120 * dayType}}rpx,0,0)"></view>
+        <view class="tab-bar" style="transform: translate3D({{60 * dayType}}px,0,0)"></view>
       </view>
       <view class="tab {{dayType === 1 ? 'active' : ''}}" data-type="{{1}}" hover-class="tab-1-hover" bindtap="handleClickTab">
         <view class="tab-label">今天</view>
-        <view class="tab-bar" style="transform: translate3D({{120 * dayType}}rpx,0,0)"></view>
+        <view class="tab-bar" style="transform: translate3D({{60 * dayType}}px,0,0)"></view>
       </view>
       <view class="tab {{dayType === 2 ? 'active' : ''}}" data-type="{{2}}" hover-class="tab-2-hover" bindtap="handleClickTab">
         <view class="tab-label">明天</view>
-        <view class="tab-bar" style="transform: translate3D({{120 * dayType}}rpx,0,0)"></view>
+        <view class="tab-bar" style="transform: translate3D({{60 * dayType}}px,0,0)"></view>
       </view>
       <view class="tab {{dayType === 3 ? 'active' : ''}}" data-type="{{3}}" hover-class="tab-3-hover" bindtap="handleClickTab">
         <view class="tab-label">后天</view>
-        <view class="tab-bar" style="transform: translate3D({{120 * dayType}}rpx,0,0)"></view>
+        <view class="tab-bar" style="transform: translate3D({{60 * dayType}}px,0,0)"></view>
       </view>
     </view>
   </view>
@@ -66,7 +66,8 @@
                 <image class="avatar-img" src="{{item.avatarUrl}}"></image>
               </view>
             </view>
-            <view class="card-avatar-des">已有{{item.participant.length}}人在队伍中</view>
+                 <view class="card-avatar-des" wx:if="{{item.maxNum  === item.participant.length}}">已有{{item.participant.length}}人在队伍中, 暂无空位</view>
+            <view class="card-avatar-des" wx:else>已有{{item.participant.length}}人在队伍中, 剩余{{item.maxNum - item.participant.length}}个空位</view>
           </view>
           <form class="card-content-right" bindsubmit="submitTemplateMessageForm" report-submit>    
             <button wx:if="{{userInfo && userInfo._id === item.creator_id}}" class="card-button {{item.cardButtonLoading ? 'card-button-loading' : ''}}" hover-class="card-button-hover" data-item="{{item}}" disabled="{{cardButtonLoading || helper.boolStatus(item.startTime,item.endTime) === 2}}"
@@ -79,8 +80,8 @@
               <view class="weui-loading" wx:if="{{item.cardButtonLoading}}"></view>
               <view class="button-label" wx:else>退出</view>
             </button>
-            <button wx:else class="card-button {{item.cardButtonLoading ? 'card-button-loading' : ''}}" hover-class="card-button-hover" data-item="{{item}}" open-type="getUserInfo" bindgetuserinfo="handleClickJoin" form-type="submit" disabled="{{cardButtonLoading || helper.boolStatus(item.startTime,item.endTime) === 2}}">
-              <view class="weui-loading" wx:if="{{item.cardButtonLoading}}"></view>
+            <button wx:else class="card-button {{item.cardButtonLoading ? 'card-button-loading' : ''}}" hover-class="card-button-hover" data-item="{{item}}" open-type="getUserInfo" bindgetuserinfo="handleClickJoin" form-type="submit" disabled="{{logining || cardButtonLoading || helper.boolStatus(item.startTime,item.endTime) === 2}}">
+              <view class="weui-loading" wx:if="{{logining || item.cardButtonLoading}}"></view>
               <view class="button-label" wx:else>加入</view>
             </button>
           </form>
@@ -94,8 +95,8 @@
   <view class="cards-tips">
     <view class="weui-loading" wx:if="{{loading}}"></view>
   </view>
-  <button class="button-add {{adding ? 'button-add-loading' : ''}}" hover-class="button-add-hover" open-type="getUserInfo" bindgetuserinfo="handleClickAdd">
-    <view class="weui-loading" wx:if="{{adding}}"></view>
+  <button class="button-add {{adding || logining ? 'button-add-loading' : ''}}" hover-class="button-add-hover" open-type="getUserInfo" bindgetuserinfo="handleClickAdd">
+    <view class="weui-loading" wx:if="{{logining || adding}}"></view>
     <image wx:else class="button-add-icon" src="/images/add_icon.png"></image>
   </button>
 </view>
