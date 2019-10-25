@@ -12,21 +12,6 @@ App({
         env: 'release-tzaqh'
       })
     }
-    const updateManager = wx.getUpdateManager()
-    updateManager.onCheckForUpdate(function (res) {
-      // 请求完新版本信息的回调
-      if (res.hasUpdate) {
-        wx.showToast({
-          icon: 'none',
-          title: '版本已更新: 1.0.10'
-        })
-      }else {
-        wx.showToast({
-          icon: 'none',
-          title: '当前版本号: 1.0.10'
-        })
-      }
-    })
     this.globalData= {
       userInfo: null
     }

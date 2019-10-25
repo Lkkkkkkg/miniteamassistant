@@ -1,7 +1,8 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/index/pages/edit/edit"
+    "pages/index/pages/edit/edit",
+    "pages/index/pages/detail/detail"
   ],
   "window": {
     "backgroundColor": "#fff",

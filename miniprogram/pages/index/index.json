@@ -2,5 +2,6 @@
     "backgroundTextStyle": "dark",
   "usingComponents": {
   },
-  "enablePullDownRefresh": true
+  "enablePullDownRefresh": true,
+  "backgroundColorBottom": "#f5f6f7"
 }

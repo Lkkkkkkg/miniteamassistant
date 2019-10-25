@@ -1,0 +1,11 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "mp-navigation-bar": "../../../../components/navigation-bar/navigation-bar"
+  },
+  "navigationBarTitleText": "队伍详情",
+  "navigationBarBackgroundColor": "#1ca2ff",
+  "navigationBarTextStyle": "white",
+  "backgroundColorTop": "#1ca2ff",
+  "backgroundColorBottom": "#fff"
+}

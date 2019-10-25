@@ -36,17 +36,16 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-   
-   this.setData({
-     userInfo: app.globalData.userInfo
-   })
+    this.setData({
+      userInfo: app.globalData.userInfo
+    })
     this.getActivity();
   },
   getActivity() {
     db.collection('activities')
       .get()
       .then(res => {
-        const activityTypeList = res.data.map(item=>{
+        const activityTypeList = res.data.map(item => {
           return item.activityName
         })
         this.setData({
@@ -54,7 +53,7 @@ Page({
           activityTypeList
         })
       })
-      .catch(err=>{
+      .catch(err => {
         wx.showToast({
           icon: 'none',
           title: '查询记录失败'
@@ -81,34 +80,46 @@ Page({
       activityTypePickerShow: false
     })
   },
+  pickerStart() {
+    this.pickerChanging = true;
+  },
+  pickerEnd() {
+    this.pickerChanging = false;
+  },
   bindActivityTypeChange(e) {
     this.setData({
       activityTypeValue: e.detail.value
     })
   },
   confirmActivityType() {
+    
+    if (this.pickerChanging) return;
     this.setData({
-      activityTypePickerShow: false,
-      activityType: this.data.activityTypeList[this.data.activityTypeValue[0]],
-      maxNumLoading: true
+      activityTypePickerShow: false
     });
-    db.collection('activities')
-      .where({
-        activityType: this.data.activityTypeValue[0]
+    if (this.data.activityType !== this.data.activityTypeList[this.data.activityTypeValue[0]]) {
+      this.setData({
+        activityType: this.data.activityTypeList[this.data.activityTypeValue[0]],
+        maxNumLoading: true
       })
-      .get()
-      .then(res => {
-        const maxNumList = Array.from({
-          length: res.data[0].maxNum - 1
-        }).map((item, index) => {
-          return index + 2;
-        });
-        this.setData({
-          maxNumList,
-          maxNumLoading: false,
-          activity: res.data[0]
+      db.collection('activities')
+        .where({
+          activityType: this.data.activityTypeValue[0]
         })
-      })
+        .get()
+        .then(res => {
+          const maxNumList = Array.from({
+            length: res.data[0].maxNum - 1
+          }).map((item, index) => {
+            return index + 2;
+          });
+          this.setData({
+            maxNumList,
+            maxNumLoading: false,
+            activity: res.data[0]
+          })
+        })
+    }
   },
   showMaxNumPicker() {
     if (!this.data.activityType || this.data.maxNumLoading) return;
@@ -127,6 +138,7 @@ Page({
     })
   },
   confirmMaxNum() {
+    if(this.pickerChanging) return;
     this.setData({
       maxNumPickerShow: false,
       maxNum: this.data.maxNumList[this.data.maxNumValue[0]]
@@ -153,6 +165,7 @@ Page({
     })
   },
   handleClickNext() {
+    if(this.pickerChanging) return;
     const isOverEndTime = (this.data.startTimeValue[0] * 1440 + this.data.startTimeValue[1] * 60 + this.data.startTimeValue[2]) >= (this.data.endTimeValue[0] * 1440 + this.data.endTimeValue[1] * 60 + this.data.endTimeValue[2]);
     this.setData({
       endTimeValue: isOverEndTime ? this.data.startTimeValue : this.data.endTimeValue, //如果开始时间大于等于结束时间，将开始时间赋值给结束时间
@@ -169,6 +182,7 @@ Page({
     })
   },
   confirmTime() {
+    if (this.pickerChanging) return;
     if ((this.data.endTimeValue[0] * 1440 + this.data.endTimeValue[1] * 60 + this.data.endTimeValue[2]) <= (this.data.startTimeValue[0] * 1440 + this.data.startTimeValue[1] * 60 + this.data.startTimeValue[2])) {
       wx.showToast({
         icon: 'none',
@@ -185,41 +199,34 @@ Page({
     //开黑时段转毫秒数
     const date = new Date();
     db.collection('teams').add({
-      data: {
-        createTime: new Date().getTime(),
-        creator_id: app.globalData.userInfo._id,
-        teamName: this.data.teamName,
-        activity: this.data.activity,
-        maxNum: this.data.maxNum,
-        startTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[0][0], this.data.duration[0][1], this.data.duration[0][2]).getTime(),
-        endTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[1][0], this.data.duration[1][1], this.data.duration[1][2]).getTime(),
-        participant: [app.globalData.userInfo],
-        remarks: this.data.remarks
-      }
-    })
+        data: {
+          createTime: new Date().getTime(),
+          creator_id: app.globalData.userInfo._id,
+          teamName: this.data.teamName,
+          activity: this.data.activity,
+          maxNum: this.data.maxNum,
+          startTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[0][0], this.data.duration[0][1], this.data.duration[0][2]).getTime(),
+          endTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[1][0], this.data.duration[1][1], this.data.duration[1][2]).getTime(),
+          participant: [app.globalData.userInfo],
+          remarks: this.data.remarks
+        }
+      })
       .then(res1 => {
         db.collection('users').doc(app.globalData.userInfo._id).update({
-          data: {
-            teams: db.command.push(res1._id)
-          }
-        }).then(res2 => {
-          //本地修改用户信息
-          app.globalData.userInfo.teams.push(res1._id);
-          //缓存用户信息
-          wx.setStorageSync('userInfo', app.globalData.userInfo);
-        
-          wx.navigateBack({
-            success() {
-              wx.showToast({
-                icon: 'none',
-                title: '发起组队成功'
-              });
-              setTimeout(() => {
-                wx.startPullDownRefresh()
-              }, 350);
+            data: {
+              teams: db.command.push(res1._id)
             }
-          });
-        })
+          }).then(res2 => {
+            //本地修改用户信息
+            app.globalData.userInfo.teams.push(res1._id);
+            wx.navigateBack({
+              success() {
+                setTimeout(() => {
+                  wx.startPullDownRefresh()
+                }, 350);
+              }
+            });
+          })
           .catch(err1 => {
             wx.showToast({
               icon: 'none',
@@ -246,9 +253,9 @@ Page({
     this.setData({
       submiting: true
     });
-    if(app.globalData.userInfo.teams.length === 0) { //用户没有队伍直接创建
+    if (app.globalData.userInfo.teams.length === 0) { //用户没有队伍直接创建
       this.addTeam();
-    }else {
+    } else {
       db.collection('teams')
         .where({
           _id: app.globalData.userInfo.teams[app.globalData.userInfo.teams.length - 1]
@@ -278,7 +285,7 @@ Page({
           });
         })
     }
-  
+
   },
   /**
    * 生命周期函数--监听页面初次渲染完成

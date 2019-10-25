@@ -45,9 +45,9 @@
       </view>
     </view>
   </view>
-  <view class="cards {{loading ? '' : 'show'}} ">
-    <view class="card {{helper.boolStatus(item.startTime,item.endTime) === 0 ? 'wait' : ''}} {{helper.boolStatus(item.startTime,item.endTime) === 1 ? 'work' : ''}} {{helper.boolStatus(item.startTime,item.endTime) === 2 ? 'end' : ''}}" hover-class="card-hover" wx:for="{{teamListArr[dayType]}}"
-      wx:key="{{item._id}}" bindtap="handleClickCard">
+  <view url="./pages/detail/detail" class="cards {{loading ? '' : 'show'}} ">
+    <navigator url="./pages/detail/detail?team_id={{item._id}}&teamName={{item.teamName}}&remarks={{item.remarks}}&startTime={{item.startTime}}&endTime={{item.endTime}}&activityIcon={{item.activity.activityIcon}}" class="card {{helper.boolStatus(item.startTime,item.endTime) === 0 ? 'wait' : ''}} {{helper.boolStatus(item.startTime,item.endTime) === 1 ? 'work' : ''}} {{helper.boolStatus(item.startTime,item.endTime) === 2 ? 'end' : ''}}" hover-class="card-hover" wx:for="{{teamListArr[dayType]}}"
+      wx:key="{{item._id}}">
       <view class="card-header">
         <image wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 2}}" class="card-disabled-icon" mode="widthFix" src="/images/overdue_icon.png"></image>
         <image class="card-icon" src="{{item.activity.activityIcon}}"></image>
@@ -90,7 +90,7 @@
       <view class="card-footer">
       </view>
 
-    </view>
+    </navigator>
   </view>
   <view class="cards-tips">
     <view class="weui-loading" wx:if="{{loading}}"></view>

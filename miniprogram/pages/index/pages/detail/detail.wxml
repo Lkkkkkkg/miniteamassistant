@@ -1,0 +1,32 @@
+<wxs src="../../../../filters/filters.wxs" module="filters" />
+<mp-navigation-bar title="队伍详情" back="{{true}}" background="#1ca2ff" color="#fff">
+</mp-navigation-bar>
+<view class="page">
+  <view class="page-header">
+    <view class="page-title">活动</view>
+    <view class="team-name">{{detail.teamName}}</view>
+    <view class="team-remarks">{{detail.remarks}}</view>
+    <view class="team-duration">{{filters.formatTime(detail.startTime)}} - {{filters.formatTime(detail.endTime)}}</view>
+    <view class="activity-icon-wrap">
+      <view class="activity-des">
+        <view class="activity-name">{{detail.activity.activityName}}</view>
+        <view class="activity-tag">{{detail.activity.activityTag}}</view>
+      </view>
+      <image class="activity-icon" src="{{detail.activity.activityIcon}}"></image>
+    </view>
+  </view>
+  <view class="page-body">
+    <view class="page-title">人员</view>
+    <view class="participants-des" wx:if="{{detail.maxNum  === detail.participant.length}}">已有{{detail.participant.length}}人在队伍中, 暂无空位</view>
+    <view class="participants-des" wx:else>已有{{detail.participant.length}}人在队伍中, 剩余{{detail.maxNum - detail.participant.length}}个空位</view>
+    <view class="participants-wrap">
+      <view class="participant-wrap" wx:for="{{detail.participant}}" wx:key="{{item._id}}">
+        <image class="participant-avatar" src="{{item.avatarUrl}}"></image>
+        <view class="participant-name">{{item.nickName}}</view>
+      </view>
+    </view>
+  </view>
+</view>
+<view class="page-tips">
+  <view class="weui-loading" wx:if="{{loading}}"></view>
+</view>

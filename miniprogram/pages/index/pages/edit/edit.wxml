@@ -19,13 +19,13 @@
     <view class="form-item" hover-class="form-item-hover" bindtap="showActivityTypePicker">
       <view class="form-require">*</view>
       <view class="form-label">活动类型</view>
-      <view class="form-value" wx:if="{{activityLoading}}">加载中</view>
+      <view class="form-value" wx:if="{{activityLoading}}" style="text-align:right"><view class="weui-loading"></view></view>
       <view class="form-value" wx:else style="color: {{activityType === null ? '#1ca2ff':''}}">{{activityType !== null ? activityType : '请选择活动类型'}}</view>
     </view>
     <view class="form-item" hover-class="form-item-hover" bindtap="showMaxNumPicker">
       <view class="form-require">*</view>
       <view class="form-label">队伍人数</view>
-      <view class="form-value" wx:if="{{maxNumLoading}}">加载中</view>
+      <view class="form-value" wx:if="{{maxNumLoading}}" style="text-align:right"><view class="weui-loading"></view></view>
       <view class="form-value" wx:else style="color: {{maxNum === null ? '#1ca2ff':''}}">{{activityType !== null ? (maxNum !== null ? maxNum : '请选择队伍人数') : '请选择活动类型'}}</view>
     </view>
     <view class="form-item" hover-class="form-item-hover" bindtap="showStartTimePicker">
@@ -39,6 +39,7 @@
       <view class="form-value">
         <input class="form-input" value="{{remarks}}" bindinput="handleRemarksInput" placeholder="请填写活动要求"></input>
       </view>
+           <view class="form-item-tips">选填</view>
     </view>
   </view>
   <!-- picker遮罩层 -->
@@ -51,7 +52,7 @@
       <view class="button-confirm" hover-class="picker-button-hover" bindtap="confirmActivityType">确定</view>
     </view>
     <view class="picker-body">
-      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{activityTypeValue}}" bindchange="bindActivityTypeChange">
+      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{activityTypeValue}}" bindchange="bindActivityTypeChange" bindpickstart="pickerStart" bindpickend="pickerEnd">
         <picker-view-column>
           <view wx:for="{{activityTypeList}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}</view>
         </picker-view-column>
@@ -66,7 +67,7 @@
       <view class="button-confirm" hover-class="picker-button-hover" bindtap="confirmMaxNum">确定</view>
     </view>
     <view class="picker-body">
-      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{maxNumValue}}" bindchange="bindMaxNumChange">
+      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{maxNumValue}}" bindchange="bindMaxNumChange" bindpickstart="pickerStart" bindpickend="pickerEnd">
         <picker-view-column>
           <view wx:for="{{maxNumList}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}</view>
         </picker-view-column>
@@ -81,7 +82,7 @@
       <view class="button-confirm" hover-class="picker-button-hover" bindtap="handleClickNext">下一步</view>
     </view>
     <view class="picker-body">
-      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{startTimeValue}}" bindchange="bindStartTimeChange">
+      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{startTimeValue}}" bindchange="bindStartTimeChange" bindpickstart="pickerStart" bindpickend="pickerEnd">
         <picker-view-column>
           <view wx:for="{{days}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}</view>
         </picker-view-column>
@@ -102,7 +103,7 @@
       <view class="button-confirm" hover-class="picker-button-hover" bindtap="confirmTime">确定</view>
     </view>
     <view class="picker-body">
-      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{endTimeValue}}" bindchange="bindEndTimeChange">
+      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{endTimeValue}}" bindchange="bindEndTimeChange" bindpickstart="pickerStart" bindpickend="pickerEnd">
         <picker-view-column>
           <view wx:for="{{days}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}</view>
         </picker-view-column>

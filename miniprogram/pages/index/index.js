@@ -81,12 +81,6 @@ Page({
         })
     })
   },
-  handleClickCard() {
-    wx.showToast({
-      icon: 'none',
-      title: '详情页开发中'
-    })
-  },
   handleClickAdd(e) {
     if (e.detail.userInfo) {
       if (!app.globalData.userInfo) { //未登录
