@@ -1,12 +1,51 @@
 <wxs src="../../../../filters/filters.wxs" module="filters" />
+<wxs module="helper">
+  var isInside = function(arr, _id) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i]._id === _id) {
+        return true;
+      }
+    }
+    return false;
+  }
+  var boolStatus = function(startTime, endTime) {
+    var nowTime = getDate().getTime();
+    if (nowTime > endTime) {
+      return 2
+    } else if (nowTime >= startTime) {
+      return 1
+    } else {
+      return 0
+    }
+  }
+  module.exports = {
+    isInside: isInside,
+    boolStatus: boolStatus
+  }
+</wxs>
 <mp-navigation-bar title="队伍详情" back="{{true}}" background="#1ca2ff" color="#fff">
 </mp-navigation-bar>
 <view class="page">
+  <image wx:if="{{helper.boolStatus(detail.startTime,detail.endTime) === 2}}" class="card-disabled-icon" mode="widthFix" src="/images/overdue_icon_black.png"></image>
   <view class="page-header">
-    <view class="page-title">活动</view>
-    <view class="team-name">{{detail.teamName}}</view>
-    <view class="team-remarks">{{detail.remarks}}</view>
-    <view class="team-duration">{{filters.formatTime(detail.startTime)}} - {{filters.formatTime(detail.endTime)}}</view>
+    <view class="page-header-top">
+      <view class="page-header-top-left">
+        <view class="page-title">{{detail.teamName}}</view>
+        <view class="team-duration">{{filters.formatTime(detail.startTime)}} - {{filters.formatTime(detail.endTime)}}</view>
+      </view>
+      <button wx:if="{{userInfo && userInfo._id === detail.creator_id}}" class="page-header-button {{buttonLoading ? 'page-header-button-hover' : ''}}" hover-class="page-header-button-hover" bindtap="disbandTeam">
+        <view class="weui-loading" wx:if="{{buttonLoading}}"></view>
+        <view class="button-label" wx:else>解散队伍</view>
+      </button>
+      <button wx:elif="{{userInfo && helper.isInside(detail.participant,userInfo._id)}}" class="page-header-button {{buttonLoading ? 'page-header-button-hover' : ''}}" hover-class="page-header-button-hover" bindtap="quitTeam">
+        <view class="weui-loading" wx:if="{{buttonLoading}}"></view>
+        <view class="button-label" wx:else>退出队伍</view>
+      </button>
+      <button wx:else class="page-header-button {{buttonLoading ? 'page-header-button-hover' : ''}}" hover-class="page-header-button-hover" open-type="getUserInfo" bindgetuserinfo="handleClickJoin">
+        <view class="weui-loading" wx:if="{{buttonLoading}}"></view>
+        <view class="button-label" wx:else>加入队伍</view>
+      </button>
+    </view>
     <view class="activity-icon-wrap">
       <view class="activity-des">
         <view class="activity-name">{{detail.activity.activityName}}</view>
@@ -26,7 +65,7 @@
       </view>
     </view>
   </view>
-</view>
-<view class="page-tips">
-  <view class="weui-loading" wx:if="{{loading}}"></view>
+  <view class="page-footer">
+    <button class="button-share" hover-class="button-share-hover" open-type="share">邀请好友</button>
+  </view>
 </view>

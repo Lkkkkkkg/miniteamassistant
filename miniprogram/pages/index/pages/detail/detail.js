@@ -1,5 +1,8 @@
 const app = getApp();
 const db = wx.cloud.database();
+const {
+  login
+} = require("../../../../api/api.js")
 Page({
 
   /**
@@ -7,29 +10,22 @@ Page({
    */
   data: {
     detail: null,
-    loading: true
+    userInfo: null,
+    buttonLoading: false
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    console.log(options)
-    const detail = {
-      teamName: options.teamName,
-      remarks: options.remarks,
-      startTime: +options.startTime,
-      endTime: +options.endTime,
-      activity: {
-        activityIcon: options.activityIcon
-      }
-    }
     this.setData({
-      detail,
+      detail: app.globalData.teamDetail,
       userInfo: app.globalData.userInfo
-    })
-    this.team_id = options.team_id;
-    this.getTeamDetail();
+    });
+    if(!app.globalData.teamDetail) {
+      this.team_id = options._id
+      this.getTeamDetail();
+    }
   },
 
   getTeamDetail() {
@@ -40,6 +36,7 @@ Page({
         })
         .get()
         .then(res => {
+          console.log(res)
           this.setData({
             detail: res.data[0],
             loading: false
@@ -58,7 +55,162 @@ Page({
         })
     })
   },
-
+  handleClickJoin(e) {
+    if (e.detail.userInfo) {
+      if (!this.data.userInfo) {
+        login(1, e.detail.userInfo)
+          .then((res) => {
+            this.setData({
+              userInfo: app.globalData.userInfo
+            })
+            this.joinTeam(e, e.detail.userInfo);
+          })
+      } else {
+        this.joinTeam(e, e.detail.userInfo);
+      }
+    }
+  },
+  joinTeam(e, userInfo) {
+    if (this.data.buttonLoading) return;
+    this.setData({
+      buttonLoading: true
+    })
+    wx.cloud.callFunction({
+      name: 'joinTeam',
+      data: {
+        team_id: this.data.detail._id,
+        userInfo: this.data.userInfo,
+        formId: this.formId
+      }
+    })
+      .then(res => {
+        if (res.result.code === 1000) {
+          //本地修改信息
+          const {detail,userInfo} = this.data;
+          detail.participant.push(this.data.userInfo);
+          userInfo.teams.push(this.data.detail._id);
+          app.globalData.userInfo.teams.push(this.data.detail._id);
+          this.setData({
+            detail,
+            userInfo,
+            buttonLoading: false
+          });
+          wx.showToast({
+            icon: 'none',
+            title: '加入队伍成功'
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: res.result.message
+          });
+          this.setData({
+            buttonLoading: false
+          });
+        }
+      })
+      .catch(err => {
+        this.setData({
+          buttonLoading: false
+        });
+        wx.showToast({
+          icon: 'none',
+          title: err.message
+        })
+      })
+  },
+  quitTeam(e) {
+    if (this.data.buttonLoading) return;
+    this.setData({
+      buttonLoading: true
+    })
+    wx.cloud.callFunction({
+      name: 'quitTeam',
+      data: {
+        team_id: this.data.detail._id,
+        userInfo: this.data.userInfo
+      }
+    })
+      .then(res => {
+        if (res.result.code === 1000) {
+          const {detail,userInfo} = this.data;
+          //本地修改队伍信息
+          const findParticipantIndex = detail.participant.findIndex(item => item._id === this.data.userInfo._id)
+          detail.participant.splice(findParticipantIndex, 1);
+          userInfo.teams.pop();
+          app.globalData.userInfo.teams.pop();
+          this.setData({
+            detail,
+            userInfo,
+            buttonLoading: false
+          });
+          //本地修改用户信息
+          wx.showToast({
+            icon: 'none',
+            title: '退出队伍成功'
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: res.result.message
+          });
+          this.setData({
+            buttonLoading: false
+          });
+        }
+      })
+      .catch(err => {
+        this.setData({
+          buttonLoading: false
+        });
+        wx.showToast({
+          icon: 'none',
+          title: err.message
+        })
+      })
+  },
+  disbandTeam(e) {
+    if (this.data.buttonLoading) return;
+    this.setData({
+      buttonLoading: true
+    })
+    wx.cloud.callFunction({
+      name: 'disbandTeam',
+      data: {
+        team_id: this.data.detail._id,
+        userInfo: this.data.userInfo
+      }
+    })
+      .then(res => {
+        if (res.result.code === 1000) {
+          this.setData({
+            buttonLoading: false
+          });
+       
+          wx.navigateBack({
+            success() {
+              wx.showToast({
+                icon: 'none',
+                title: '解散队伍成功'
+              })
+              setTimeout(() => {
+                wx.startPullDownRefresh();
+           
+              }, 350);
+            }
+          });
+        }
+      })
+      .catch(err => {
+        this.setData({
+          buttonLoading: false
+        })
+        wx.showToast({
+          icon: 'none',
+          title: err.message
+        })
+      })
+  },
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
@@ -105,6 +257,9 @@ Page({
    * 用户点击右上角分享
    */
   onShareAppMessage: function() {
-
+    return {
+      title: `这有一支${this.data.detail.activity.activityName}的队伍，快来加入吧`,
+      imageUrl: this.data.detail.activity.activityIcon
+    }
   }
 })

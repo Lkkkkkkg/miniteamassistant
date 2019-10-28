@@ -81,6 +81,12 @@ Page({
         })
     })
   },
+  toDetail(e) {
+    app.globalData.teamDetail = e.currentTarget.dataset.item;
+    wx.navigateTo({
+      url: './pages/detail/detail?_id=' + e.currentTarget.dataset.item._id,
+    })
+  },
   handleClickAdd(e) {
     if (e.detail.userInfo) {
       if (!app.globalData.userInfo) { //未登录
@@ -105,170 +111,6 @@ Page({
         })
       }
     }
-  },
-  joinTeam(e, userInfo) {
-    if (e.currentTarget.dataset.item._id.cardButtonLoading) return;
-    const teamListArr = this.data.teamListArr;
-    const teamItem = teamListArr[this.data.dayType].find(item => item._id === e.currentTarget.dataset.item._id);
-    teamItem.cardButtonLoading = true;
-    this.setData({
-      teamListArr
-    })
-    wx.cloud.callFunction({
-        name: 'joinTeam',
-        data: {
-          team_id: e.currentTarget.dataset.item._id,
-          userInfo: app.globalData.userInfo,
-          formId: this.formId
-        }
-      })
-      .then(res => {
-        if (res.result.code === 1000) {
-          //本地修改队伍信息
-          teamItem.participant.push(app.globalData.userInfo);
-          teamItem.cardButtonLoading = false;
-          this.setData({
-            teamListArr
-          });
-          //本地修改用户信息
-          app.globalData.userInfo.teams.push(e.currentTarget.dataset.item._id);
-          wx.showToast({
-            icon: 'none',
-            title: '加入队伍成功'
-          })
-        } else {
-          wx.showToast({
-            icon: 'none',
-            title: res.result.message
-          });
-          teamItem.cardButtonLoading = false;
-          this.setData({
-            teamListArr
-          });
-        }
-      })
-      .catch(err => {
-        teamItem.cardButtonLoading = false;
-        this.setData({
-          teamListArr
-        });
-        wx.showToast({
-          icon: 'none',
-          title: err.message
-        })
-      })
-  },
-  handleClickJoin(e) {
-    if (e.detail.userInfo) {
-      if (!app.globalData.userInfo) {
-        login(1,e.detail.userInfo)
-          .then((res) => {
-            this.setData({
-              userInfo: app.globalData.userInfo
-            })
-            this.joinTeam(e, e.detail.userInfo);
-          })
-      } else {
-        this.joinTeam(e, e.detail.userInfo);
-      }
-    }
-  },
-  submitTemplateMessageForm(e) {
-    this.formId = e.detail.formId;
-  },
-  quitTeam(e) {
-    if (e.currentTarget.dataset.item._id.cardButtonLoading) return;
-    const teamListArr = this.data.teamListArr;
-    const teamItem = teamListArr[this.data.dayType].find(item => item._id === e.currentTarget.dataset.item._id);
-    teamItem.cardButtonLoading = true;
-    this.setData({
-      teamListArr
-    });
-    wx.cloud.callFunction({
-        name: 'quitTeam',
-        data: {
-          team_id: e.currentTarget.dataset.item._id,
-          userInfo: app.globalData.userInfo
-        }
-      })
-      .then(res => {
-        if (res.result.code === 1000) {
-          //本地修改队伍信息
-          const findParticipantIndex = teamItem.participant.findIndex(item => item._id === app.globalData.userInfo._id)
-          teamItem.participant.splice(findParticipantIndex, 1);
-          teamItem.cardButtonLoading = false;
-          this.setData({
-            teamListArr
-          });
-          //本地修改用户信息
-          app.globalData.userInfo.teams.pop();
-          wx.showToast({
-            icon: 'none',
-            title: '退出队伍成功'
-          })
-        } else {
-          wx.showToast({
-            icon: 'none',
-            title: res.result.message
-          });
-          teamItem.cardButtonLoading = false;
-          this.setData({
-            teamListArr
-          });
-        }
-      })
-      .catch(err => {
-        teamItem.cardButtonLoading = false;
-        this.setData({
-          teamListArr
-        });
-        wx.showToast({
-          icon: 'none',
-          title: err.message
-        })
-      })
-  },
-  disbandTeam(e) {
-    if (e.currentTarget.dataset.item._id.cardButtonLoading) return;
-    const teamListArr = this.data.teamListArr;
-    const teamItem = teamListArr[this.data.dayType].find(item => item._id === e.currentTarget.dataset.item._id);
-    teamItem.cardButtonLoading = true;
-    this.setData({
-      teamListArr
-    });
-    wx.cloud.callFunction({
-        name: 'disbandTeam',
-        data: {
-          team_id: e.currentTarget.dataset.item._id,
-          userInfo: app.globalData.userInfo
-        }
-      })
-      .then(res => {
-        if (res.result.code === 1000) {
-          teamItem.cardButtonLoading = false;
-          //本地修改队伍信息
-          const teamListArr = this.data.teamListArr;
-          const teamItemIndex = teamListArr[this.data.dayType].findIndex(item => item._id === e.currentTarget.dataset.item._id);
-          teamListArr[this.data.dayType].splice(teamItemIndex, 1);
-          this.setData({
-            teamListArr
-          });
-          wx.showToast({
-            icon: 'none',
-            title: '解散队伍成功'
-          })
-        }
-      })
-      .catch(err => {
-        teamItem.cardButtonLoading = false;
-        this.setData({
-          teamListArr
-        });
-        wx.showToast({
-          icon: 'none',
-          title: err.message
-        })
-      })
   },
   /**
    * 生命周期函数--监听页面初次渲染完成

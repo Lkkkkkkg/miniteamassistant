@@ -32,7 +32,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 1,
+			"current": 2,
 			"list": [
 				{
 					"id": -1,
@@ -44,6 +44,13 @@
 					"id": -1,
 					"name": "pages/index/pages/edit/edit",
 					"pathName": "pages/index/pages/edit/edit",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/index/pages/detail/detail",
+					"pathName": "pages/index/pages/detail/detail",
 					"scene": null
 				}
 			]

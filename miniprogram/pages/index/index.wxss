@@ -153,7 +153,6 @@
 }
 
 .card-title {
-  width: 400rpx;
   font-size: 44rpx;
   color: #333;
   overflow: hidden;
@@ -161,14 +160,7 @@
   white-space: nowrap;
 }
 
-.card-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .card-content-item {
-  width: 400rpx;
   display: flex;
   color: #666;
   align-items: center;
@@ -230,6 +222,7 @@
 
 .button-label {
   font-size: 30rpx;
+  text-align: center;
 }
 
 .card-disabled-icon {

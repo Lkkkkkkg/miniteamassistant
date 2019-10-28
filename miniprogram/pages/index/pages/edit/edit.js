@@ -36,6 +36,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
+    console.log(wx.cloud)
     this.setData({
       userInfo: app.globalData.userInfo
     })
@@ -92,7 +93,6 @@ Page({
     })
   },
   confirmActivityType() {
-    
     if (this.pickerChanging) return;
     this.setData({
       activityTypePickerShow: false
@@ -196,6 +196,7 @@ Page({
     })
   },
   addTeam() {
+
     //开黑时段转毫秒数
     const date = new Date();
     db.collection('teams').add({
@@ -221,6 +222,10 @@ Page({
             app.globalData.userInfo.teams.push(res1._id);
             wx.navigateBack({
               success() {
+                wx.showToast({
+                  icon: 'none',
+                  title: '发起队伍成功'
+                })
                 setTimeout(() => {
                   wx.startPullDownRefresh()
                 }, 350);
@@ -228,6 +233,9 @@ Page({
             });
           })
           .catch(err1 => {
+            this.setData({
+              submiting: false
+            })
             wx.showToast({
               icon: 'none',
               title: '更新记录失败'
@@ -239,8 +247,6 @@ Page({
           icon: 'none',
           title: '添加记录失败'
         })
-      })
-      .finally(() => {
         this.setData({
           submiting: false
         })
@@ -253,39 +259,64 @@ Page({
     this.setData({
       submiting: true
     });
-    if (app.globalData.userInfo.teams.length === 0) { //用户没有队伍直接创建
-      this.addTeam();
-    } else {
-      db.collection('teams')
-        .where({
-          _id: app.globalData.userInfo.teams[app.globalData.userInfo.teams.length - 1]
-        })
-        .get()
-        .then(res => {
-          if (res.data.length > 0 && new Date().getTime() <= res.data[0].endTime) { //判断用户是否已经加入一个队伍
-            wx.showToast({
-              icon: 'none',
-              title: '你已经加入了一个队伍'
-            });
-            this.setData({
-              submiting: false
-            });
-          } else {
-            this.addTeam();
-          }
-        })
-        .catch(err => {
-          console.log(err)
-          wx.showToast({
-            icon: 'none',
-            title: '查询记录失败'
-          })
-          this.setData({
-            submiting: false
-          });
-        })
-    }
-
+    wx.cloud.callFunction({
+      name: "checkMessage",
+      data: {
+        content: this.data.teamName + this.data.remarks
+      }
+    })
+    .then(res=>{
+      if(res.result.errCode === 0) {
+        if (app.globalData.userInfo.teams.length === 0) { //用户没有队伍直接创建
+          this.addTeam();
+        } else {
+          db.collection('teams')
+            .where({
+              _id: app.globalData.userInfo.teams[app.globalData.userInfo.teams.length - 1]
+            })
+            .get()
+            .then(res => {
+              if (res.data.length > 0 && new Date().getTime() <= res.data[0].endTime) { //判断用户是否已经加入一个队伍
+                wx.showToast({
+                  icon: 'none',
+                  title: '你已经加入了一个队伍'
+                });
+                this.setData({
+                  submiting: false
+                });
+              } else {
+                this.addTeam();
+              }
+            })
+            .catch(err => {
+              console.log(err)
+              wx.showToast({
+                icon: 'none',
+                title: '查询记录失败'
+              })
+              this.setData({
+                submiting: false
+              });
+            })
+        }
+      }else {
+        wx.showToast({
+          icon: 'none',
+          title: '内容含有违法违规内容	'
+        }); this.setData({
+          submiting: true
+        });
+      }
+    })
+    .catch(err=>{
+      wx.showToast({
+        icon: 'none',
+        title: '检测违法违规内容失败'
+      })
+      this.setData({
+        submiting: true
+      });
+    })
   },
   /**
    * 生命周期函数--监听页面初次渲染完成

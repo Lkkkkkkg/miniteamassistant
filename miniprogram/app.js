@@ -13,7 +13,8 @@ App({
       })
     }
     this.globalData= {
-      userInfo: null
+      userInfo: null,
+      teamDetail: null
     }
   }
 })
