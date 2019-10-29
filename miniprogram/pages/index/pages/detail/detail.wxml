@@ -26,7 +26,9 @@
 <mp-navigation-bar title="队伍详情" back="{{true}}" background="#1ca2ff" color="#fff">
 </mp-navigation-bar>
 <view class="page">
-  <image wx:if="{{helper.boolStatus(detail.startTime,detail.endTime) === 2}}" class="card-disabled-icon" mode="widthFix" src="/images/overdue_icon_black.png"></image>
+  <view class="page-disabled"  wx:if="{{helper.boolStatus(detail.startTime,detail.endTime) === 2}}">
+    <image class="card-disabled-icon" mode="widthFix" src="/images/overdue_icon_black.png"></image>
+  </view>
   <view class="page-header">
     <view class="page-header-top">
       <view class="page-header-top-left">

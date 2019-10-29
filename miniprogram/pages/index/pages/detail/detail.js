@@ -22,10 +22,7 @@ Page({
       detail: app.globalData.teamDetail,
       userInfo: app.globalData.userInfo
     });
-    if(!app.globalData.teamDetail) {
-      this.team_id = options._id
-      this.getTeamDetail();
-    }
+    this.team_id = options._id
   },
 
   getTeamDetail() {
@@ -61,7 +58,7 @@ Page({
         login(1, e.detail.userInfo)
           .then((res) => {
             this.setData({
-              userInfo: app.globalData.userInfo
+              userInfo: res.result.data.userInfo
             })
             this.joinTeam(e, e.detail.userInfo);
           })
@@ -186,19 +183,26 @@ Page({
           this.setData({
             buttonLoading: false
           });
-       
-          wx.navigateBack({
-            success() {
-              wx.showToast({
-                icon: 'none',
-                title: '解散队伍成功'
-              })
-              setTimeout(() => {
-                wx.startPullDownRefresh();
-           
-              }, 350);
-            }
-          });
+          if (getCurrentPages().length === 1) {
+            wx.navigateTo({
+              url: '/pages/index/index',
+              success: ()=>{
+                wx.showToast({
+                  icon: 'none',
+                  title: '解散队伍成功'
+                })
+              }
+            })
+          }else  {
+            wx.navigateBack({
+              success() {
+                wx.showToast({
+                  icon: 'none',
+                  title: '解散队伍成功'
+                })
+              }
+            });
+          }
         }
       })
       .catch(err => {
@@ -221,8 +225,8 @@ Page({
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow: function() {
-
+  onShow: function () {
+    this.getTeamDetail();
   },
 
   /**

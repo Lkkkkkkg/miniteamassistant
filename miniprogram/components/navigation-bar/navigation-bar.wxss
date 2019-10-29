@@ -51,8 +51,8 @@ page {
 }
 
 .icon-left {
-  width: 36rpx;
-  height: 36rpx;
+  width: 18px;
+  height: 18px;
 }
 
 .weui-navigation-bar__inner .weui-navigation-bar__left .weui-navigation-bar__btn_goback:active {

@@ -84,65 +84,54 @@ exports.main = async(event, context) => {
   const wxContext = cloud.getWXContext()
   return new Promise((resolve, reject) => {
     const db = cloud.database();
-    db.collection('teams')
+    db.collection('users')
       .where({
-        _id: event.team_id
+        _openid: wxContext.OPENID
       })
       .get()
       .then(res => {
-        if (res.data.length === 0) {
-          resolve({
-            code: 1001,
-            data: {},
-            message: '队伍已解散'
+        const p1 = db.collection('teams')
+          .where({
+            _id: event.team_id
           })
-        } else if (new Date().getTime() > res.data[0].endTime) { //判断活动是否过期
-          resolve({
-            code: 1002,
-            data: {},
-            message: '活动已结束'
+          .get();
+        const p2 = db.collection('teams')
+          .where({
+            _id: res.data[0].teams[res.data[0].teams.length - 1]
           })
-        } else if (res.data[0].participant.length === res.data[0].maxNum) { //判断队伍是否已满
-          resolve({
-            code: 1003,
-            data: {},
-            message: '队伍已满'
-          })
-        } else {
-          if (event.userInfo.teams.length === 0) {
-            joinTeam(event, res.data[0], resolve, reject)
-          } else {
-            db.collection('teams')
-              .where({
-                _id: event.userInfo.teams[event.userInfo.teams.length - 1]
-              })
-              .get()
-              .then(res1 => { //判断用户是否已经加入一个队伍
-                if (res1.data.length > 0 && new Date().getTime() <= res1.data[0].endTime) {
-                  resolve({
-                    code: 1004,
-                    data: {},
-                    message: '你已经加入了一个队伍'
-                  })
-                } else {
-                  joinTeam(event, res.data[0], resolve, reject)
-                }
-              })
-              .catch(err1 => {
-                reject({
-                  code: 2000,
-                  data: {},
-                  message: err1
-                })
-              })
+          .get()
+        Promise.all([p1,p2]).then((res1)=>{
+          if (res1[0].data.length === 0) {
+            resolve({
+              code: 1001,
+              data: {},
+              message: '队伍已解散'
+            })
+          } else if (new Date().getTime() > res1[0].data[0].endTime) { //判断活动是否过期
+            resolve({
+              code: 1002,
+              data: {},
+              message: '活动已结束'
+            })
+          } else if (res1[0].data[0].participant.length === res1[0].data[0].maxNum) { //判断队伍是否已满
+            resolve({
+              code: 1003,
+              data: {},
+              message: '队伍已满'
+            })
+          } else if (res1[1].data.length > 0 && res1[0].data[0].startTime <= res1[1].data[0].endTime) { //判断是否已有队伍
+            resolve({
+              code: 1004,
+              data: {},
+              message: '该活动时段内你已经加入了一个队伍'
+            })
+          }else {
+            console.log(res1[1].data.length > 0, res1[0].data.startTime <= res1[1].data[0].endTime)
+            joinTeam({
+              team_id: event.team_id,
+              userInfo: res.data[0]
+            }, res1[0].data[0], resolve, reject)
           }
-        }
-      })
-      .catch(err => {
-        reject({
-          code: 2000,
-          data: {},
-          message: err
         })
       })
   })

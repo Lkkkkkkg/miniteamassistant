@@ -60,7 +60,6 @@ Page({
         .where({
           endTime: db.command.gt(timeArr[this.data.dayType])
         })
-        .orderBy('endTime', 'desc')
         .orderBy('createTime', 'desc')
         .get()
         .then(res => {
@@ -123,7 +122,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function() {
-
+    this.getTeamList();
   },
 
   /**
