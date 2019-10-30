@@ -24,7 +24,7 @@ exports.main = async(event, context) => {
             })
             .get()
             .then(res1 => {
-              if (res1.data.length > 0 && new Date().getTime <= res1.data[0].endTime && event.startTime <= res1.data[0].endTime) { //判断是否已有队伍
+              if (res1.data.length > 0  && event.startTime <= res1.data[0].endTime) { //判断是否已有队伍
                 resolve({
                   code: 1001,
                   data: {},

@@ -119,7 +119,7 @@ exports.main = async(event, context) => {
               data: {},
               message: '队伍已满'
             })
-          } else if (res1[1].data.length > 0 && new Date().getTime <= res1[1].data[0].endTime && res1[0].data[0].startTime <= res1[1].data[0].endTime) { //判断是否已有队伍
+          } else if (res1[1].data.length > 0 && res1[0].data[0].startTime <= res1[1].data[0].endTime) { //判断是否已有队伍
             resolve({
               code: 1004,
               data: {},
