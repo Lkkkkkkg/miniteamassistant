@@ -44,7 +44,7 @@
         <view class="button-label" wx:else>退出队伍</view>
       </button>
       <button wx:else class="page-header-button {{buttonLoading ? 'page-header-button-hover' : ''}}" hover-class="page-header-button-hover" open-type="getUserInfo" bindgetuserinfo="handleClickJoin">
-        <view class="weui-loading" wx:if="{{buttonLoading}}"></view>
+        <view class="weui-loading" wx:if="{{logining || buttonLoading}}"></view>
         <view class="button-label" wx:else>加入队伍</view>
       </button>
     </view>

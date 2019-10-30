@@ -22,9 +22,27 @@ Page({
       detail: app.globalData.teamDetail,
       userInfo: app.globalData.userInfo
     });
-    this.team_id = options._id
+    if(!app.globalData.userInfo) this.autoLogin();
+    this.team_id = options._id;
   },
-
+  autoLogin() {
+    this.setData({
+      logining: true
+    })
+    login(0)
+      .then((res) => {
+        if (res.result.code === 1000) {
+          this.setData({
+            userInfo: res.result.data.userInfo,
+            logining: false
+          })
+        } else {
+          this.setData({
+            logining: false
+          })
+        }
+      })
+  },
   getTeamDetail() {
     return new Promise((resolve, rejcet) => {
       db.collection('teams')
