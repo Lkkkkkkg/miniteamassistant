@@ -175,7 +175,7 @@ Component({
         back: function back() {
             var data = this.data;
           if (getCurrentPages().length === 1) {
-            wx.navigateTo({
+            wx.switchTab({
               url: '/pages/index/index',
             })
           }else {

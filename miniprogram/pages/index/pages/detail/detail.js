@@ -202,9 +202,9 @@ Page({
             buttonLoading: false
           });
           if (getCurrentPages().length === 1) {
-            wx.navigateTo({
+            wx.switchTab({
               url: '/pages/index/index',
-              success: ()=>{
+              success: () => {
                 wx.showToast({
                   icon: 'none',
                   title: '解散队伍成功'

@@ -8,7 +8,7 @@ exports.main = async(event, context) => {
   const db = cloud.database();
   try {
     const res = await cloud.openapi.security.msgSecCheck({
-      content: event.teamName + event.remarks
+      content: event.data.teamName + event.data.remarks
     })
     //内容无违规
     return new Promise((resolve, reject) => {
@@ -24,7 +24,7 @@ exports.main = async(event, context) => {
             })
             .get()
             .then(res1 => {
-              if (res1.data.length > 0  && event.startTime <= res1.data[0].endTime) { //判断是否已有队伍
+              if (res1.data.length > 0  && event.data.startTime <= res1.data[0].endTime) { //判断是否已有队伍
                 resolve({
                   code: 1001,
                   data: {},
@@ -32,21 +32,10 @@ exports.main = async(event, context) => {
                 })
               } else {
                 db.collection('teams').add({
-                    data: {
-                      createTime: event.createTime,
-                      creator_id: event.creator_id,
-                      teamName: event.teamName,
-                      activity: event.activity,
-                      maxNum: event.maxNum,
-                      startTime: event.startTime,
-                      endTime: event.endTime,
-                      participant: event.participant,
-                      remarks: event.remarks
-                    }
+                  data: event.data
                   })
                   .then(res2 => {
-                    console.log(event.creator_id)
-                    db.collection('users').doc(event.creator_id).update({
+                    db.collection('users').doc(event.data.creator._id).update({
                         data: {
                           teams: db.command.push(res2._id)
                         }

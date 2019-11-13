@@ -15,14 +15,21 @@ Page({
     loading: true,
     dayType: 1,
     adding: false,
-    logining: false
+    logining: false,
+    activityLoading: true,
+    activityTypePickerShow: false,
+    activityTypeList: null,
+    activityTypeValue: [0],
+    activityType: '全部类型',
+    joining: false
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    if(!app.globalData.userInfo) this.autoLogin();
+    this.autoLogin();
+    this.getActivity();
     this.getTeamList();
   },
   autoLogin() {
@@ -66,10 +73,14 @@ Page({
         .orderBy('createTime', 'desc')
         .get()
         .then(res => {
-          const teamListArr = this.data.teamListArr;
-          teamListArr[this.data.dayType] = res.data;
+          res.data.forEach(item=>{
+            item.overdue = new Date().valueOf() > item.endTime ? 1 : 0
+          })
+          res.data.sort((a,b)=>{
+            return a.overdue - b.overdue;
+          })
           this.setData({
-            teamListArr,
+            [`teamListArr[${this.data.dayType}]`]: res.data,
             loading: false
           });
           resolve(res);
@@ -84,14 +95,14 @@ Page({
     })
   },
   toDetail(e) {
-    app.globalData.teamDetail = e.currentTarget.dataset.item;
-    wx.navigateTo({
-      url: './pages/detail/detail?_id=' + e.currentTarget.dataset.item._id,
-    })
+    // app.globalData.teamDetail = e.currentTarget.dataset.item;
+    // wx.navigateTo({
+    //   url: './pages/detail/detail?_id=' + e.currentTarget.dataset.item._id,
+    // })
   },
   handleClickAdd(e) {
     if (e.detail.userInfo) {
-      if (!app.globalData.userInfo) { //未登录
+      if (!this.data.userInfo) { //未登录
         this.setData({
           adding: true
         })
@@ -113,6 +124,135 @@ Page({
         })
       }
     }
+  },
+  getActivity() {
+    db.collection('activities')
+      .get()
+      .then(res => {
+        const activityTypeList = [...['全部类型'], ...res.data.map(item => {
+          return item.activityName
+        })]
+        this.setData({
+          activityLoading: false,
+          activityTypeList
+        })
+      })
+      .catch(err => {
+        wx.showToast({
+          icon: 'none',
+          title: '查询记录失败'
+        });
+      })
+  },
+  showActivityTypePicker() {
+    this.setData({
+      activityTypePickerShow: true
+    })
+  },
+  closeActivityTypePicker() {
+    this.setData({
+      activityTypePickerShow: false
+    })
+  },
+  pickerStart() {
+    this.pickerChanging = true;
+  },
+  pickerEnd() {
+    this.pickerChanging = false;
+  },
+  bindActivityTypeChange(e) {
+    this.setData({
+      activityTypeValue: e.detail.value
+    })
+  },
+  confirmActivityType() {
+    if (this.pickerChanging) return;
+    this.setData({
+      activityTypePickerShow: false
+    });
+    if (this.data.activityType !== this.data.activityTypeList[this.data.activityTypeValue[0]]) {
+      this.setData({
+        activityType: this.data.activityTypeList[this.data.activityTypeValue[0]]
+      })
+    }
+  },
+  handleClickJoin(e) {
+    if (e.detail.userInfo) {
+      if (!this.data.userInfo) {
+        login(1, e.detail.userInfo)
+          .then((res) => {
+            this.setData({
+              userInfo: res.result.data.userInfo
+            })
+            this.joinTeam(e, e.detail.userInfo);
+          })
+      } else {
+        this.joinTeam(e, e.detail.userInfo);
+      }
+    }
+  },
+  joinTeam(e, userInfo) {
+    const teamListArr = this.data.teamListArr;
+    const team = teamListArr[this.data.dayType].find((item)=>{
+      return item._id === e.currentTarget.dataset.team_id
+    })
+    team.participant[e.currentTarget.dataset.index] = {
+      joining: true
+    };
+    this.setData({
+      teamListArr
+    })
+    wx.cloud.callFunction({
+      name: 'joinTeam',
+      data: {
+        team_id: team._id,
+        userInfo: this.data.userInfo,
+        index: e.currentTarget.dataset.index
+      }
+    })
+      .then(res => {
+        if (res.result.code === 1000) {
+          //本地修改信息
+          const { userInfo } = this.data;
+          team.participant[e.currentTarget.dataset.index] = {
+            joining: false
+          };
+          team.participant[e.currentTarget.dataset.index].player = this.data.userInfo;
+          userInfo.teams.push(team._id);
+          app.globalData.userInfo.teams.push(team._id);
+          this.setData({
+            userInfo,
+            teamListArr
+          });
+          wx.showToast({
+            icon: 'none',
+            title: '加入队伍成功'
+          })
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: res.result.message
+          });
+          team.participant[e.currentTarget.dataset.index] = {
+            joining: false
+          };
+          this.setData({
+            teamListArr
+          })
+        }
+      })
+      .catch(err => {
+        wx.showToast({
+          icon: 'none',
+          title: err.message
+        });
+        team.participant[e.currentTarget.dataset.index] = {
+          joining: false
+        };
+        this.setData({
+          teamListArr
+        })
+      })
   },
   /**
    * 生命周期函数--监听页面初次渲染完成

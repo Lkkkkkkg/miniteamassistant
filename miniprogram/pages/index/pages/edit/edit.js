@@ -36,7 +36,6 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    console.log(wx.cloud)
     this.setData({
       userInfo: app.globalData.userInfo
     })
@@ -183,7 +182,7 @@ Page({
   },
   confirmTime() {
     if (this.pickerChanging) return;
-    if ((this.data.endTimeValue[0] * 1440 + this.data.endTimeValue[1] * 60 + this.data.endTimeValue[2]) <= (this.data.startTimeValue[0] * 1440 + this.data.startTimeValue[1] * 60 + this.data.startTimeValue[2])) {
+    if ((this.data.endTimeValue[0] * 1440 + this.data.endTimeValue[1] * 60 + this.data.endTimeValue[2]) < (this.data.startTimeValue[0] * 1440 + this.data.startTimeValue[1] * 60 + this.data.startTimeValue[2])) {
       wx.showToast({
         icon: 'none',
         title: '结束时间必须大于开始时间'
@@ -195,60 +194,6 @@ Page({
       duration: [this.data.startTimeValue, this.data.endTimeValue]
     })
   },
-  addTeam() {
-
-    //开黑时段转毫秒数
-    const date = new Date();
-    db.collection('teams').add({
-        data: {
-          createTime: new Date().getTime(),
-          creator_id: app.globalData.userInfo._id,
-          teamName: this.data.teamName,
-          activity: this.data.activity,
-          maxNum: this.data.maxNum,
-          startTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[0][0], this.data.duration[0][1], this.data.duration[0][2]).getTime(),
-          endTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[1][0], this.data.duration[1][1], this.data.duration[1][2]).getTime(),
-          participant: [app.globalData.userInfo],
-          remarks: this.data.remarks
-        }
-      })
-      .then(res1 => {
-        db.collection('users').doc(app.globalData.userInfo._id).update({
-            data: {
-              teams: db.command.push(res1._id)
-            }
-          }).then(res2 => {
-            //本地修改用户信息
-            app.globalData.userInfo.teams.push(res1._id);
-            wx.navigateBack({
-              success() {
-                wx.showToast({
-                  icon: 'none',
-                  title: '发起队伍成功'
-                })
-              }
-            });
-          })
-          .catch(err1 => {
-            this.setData({
-              submiting: false
-            })
-            wx.showToast({
-              icon: 'none',
-              title: '更新记录失败'
-            })
-          })
-      })
-      .catch(err => {
-        wx.showToast({
-          icon: 'none',
-          title: '添加记录失败'
-        })
-        this.setData({
-          submiting: false
-        })
-      })
-  },
   submit() {
     if (this.data.submiting || this.data.teamName === 0 || this.data.activityType === null || this.data.maxNum === null || this.data.duration === null) {
       return;
@@ -257,18 +202,27 @@ Page({
       submiting: true
     });
     const date = new Date();
+    const participant = [];
+    for (var i = 0; i < this.data.maxNum - 1; i++) {
+      participant[i] = {
+        player: null
+      }
+    }
     wx.cloud.callFunction({
         name: "addTeam",
         data: {
-          createTime: new Date().getTime(),
-          creator_id: app.globalData.userInfo._id,
-          teamName: this.data.teamName,
-          activity: this.data.activity,
-          maxNum: this.data.maxNum,
-          startTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[0][0], this.data.duration[0][1], this.data.duration[0][2]).getTime(),
-          endTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[1][0], this.data.duration[1][1], this.data.duration[1][2]).getTime(),
-          participant: [app.globalData.userInfo],
-          remarks: this.data.remarks
+          data: {
+            createTime: new Date().getTime(),
+            teamName: this.data.teamName,
+            activity: this.data.activity,
+            maxNum: this.data.maxNum,
+            currentNum: 1,
+            startTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[0][0], this.data.duration[0][1], this.data.duration[0][2], 0).getTime(),
+            endTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[1][0], this.data.duration[1][1], this.data.duration[1][2], 59).getTime(),
+            creator: app.globalData.userInfo,
+            participant,
+            remarks: this.data.remarks
+          }
         }
       })
       .then(res => {
@@ -292,48 +246,6 @@ Page({
             title: res.result.message
           });
         }
-        console.log(res)
-        // if(res.result.errCode === 0) {
-        //   if (app.globalData.userInfo.teams.length === 0) { //用户没有队伍直接创建
-        //     this.addTeam();
-        //   } else {
-        //     db.collection('teams')
-        //       .where({
-        //         _id: app.globalData.userInfo.teams[app.globalData.userInfo.teams.length - 1]
-        //       })
-        //       .get()
-        //       .then(res => {
-        //         if (res.data.length > 0 && new Date().getTime() <= res.data[0].endTime) { //判断用户是否已经加入一个队伍
-        //           wx.showToast({
-        //             icon: 'none',
-        //             title: '你已经加入了一个队伍'
-        //           });
-        //           this.setData({
-        //             submiting: false
-        //           });
-        //         } else {
-        //           this.addTeam();
-        //         }
-        //       })
-        //       .catch(err => {
-        //         console.log(err)
-        //         wx.showToast({
-        //           icon: 'none',
-        //           title: '查询记录失败'
-        //         })
-        //         this.setData({
-        //           submiting: false
-        //         });
-        //       })
-        //   }
-        // }else {
-        //   wx.showToast({
-        //     icon: 'none',
-        //     title: '内容含有违法违规内容	'
-        //   }); this.setData({
-        //     submiting: true
-        //   });
-        // }
       })
       .catch(err => {
         wx.showToast({
@@ -386,11 +298,4 @@ Page({
   onReachBottom: function() {
 
   },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function() {
-
-  }
 })

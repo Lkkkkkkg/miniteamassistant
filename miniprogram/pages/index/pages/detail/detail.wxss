@@ -30,29 +30,8 @@ page {
 .page-header-top {
   min-height: 102rpx;
   padding: 0 30rpx;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
-.page-header-button {
-  width: 200rpx;
-  height: 70rpx;
-  line-height: 70rpx;
-  text-align: center;
-  font-size: 0;
-  border: 2rpx solid #fff;
-  color: #fff;
-  transition: opacity 0.45s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-.page-header-button-hover {
-  opacity: 0.5;
-}
-
-.button-label {
-  font-size: 32rpx;
-}
 
 .page-title {
   display: flex;
@@ -146,15 +125,39 @@ page {
   padding: 30rpx 0;
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+
+
+.button-action {
+  width: 200rpx;
+  height: 70rpx;
+  line-height: 70rpx;
+  text-align: center;
+  font-size: 0;
+  color: #fff;
+  background-color: #1ca2ff;
+  transition: opacity 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.button-action-hover {
+  opacity: 0.5;
+}
+
+.button-label {
+  font-size: 32rpx;
 }
 
 .button-share {
   margin: auto;
-  padding: 14rpx 50rpx;
   background-color: #1ca2ff;
   color: #fff;
   font-size: 33rpx;
   transition: opacity 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+  width: 70rpx;
+  height: 70rpx;
+  border-radius: 50%;
+  margin-left: 20rpx;
 }
 
 .button-share-hover {

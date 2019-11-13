@@ -1,0 +1,58 @@
+<view class="page">
+  <view class="page-header">
+    <view class="nickname" wx:if="{{userInfo}}">{{userInfo.nickName}}</view>
+    <button class="login-text" hover-class="login-text-hover" wx:else open-type="getUserInfo" bindgetuserinfo="handleClickLogin">
+      <view class="weui-loading" wx:if="{{logining}}"></view>
+      <view class="button-label" wx:else>点击授权登录</view>
+    </button>
+    <view class="avatar-wrap">
+      <view class="avatar-border" wx:if="{{userInfo}}">
+        <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
+      </view>
+      <text class="login-icon {{logining ? 'login-icon-loading' : ''}}" wx:else></text>
+    </view>
+    <view class="extra">
+      <view class="extra-item" style="border-right: 1rpx solid #ccc">
+        <view class="extra-num">{{userInfo ? userInfo.liked : '-'}}</view>
+        <view class="extra-label">获赞</view>
+      </view>
+      <view class="extra-item">
+        <view class="extra-content">
+          <view class="extra-num">{{userInfo ? userInfo.followers : '-'}}</view>
+          <view class="extra-label">粉丝</view>
+        </view>
+      </view>
+      <view class="extra-item" style="border-left: 1rpx solid #ccc">
+        <view class="extra-num">{{userInfo ? userInfo.following : '-'}}</view>
+        <view class="extra-label">关注</view>
+      </view>
+    </view>
+  </view>
+  <view class="page-body">
+    <view class="panel">
+      <view class="panel-item-wrap" hover-class="panel-item-wrap-hover" bindtap="handleClickPanelItem">
+        <view class="panel-item">
+          <text class="panel-icon icon icon-team"></text>
+          <view class="panel-item-content">我的队伍</view>
+          <text class="icon icon-arrow"></text>
+        </view>
+      </view>
+    </view>
+    <view class="panel">
+      <view class="panel-item-wrap" hover-class="panel-item-wrap-hover" bindtap="handleClickPanelItem">
+        <view class="panel-item">
+          <text class="panel-icon icon icon-setting"></text>
+          <view class="panel-item-content">设置</view>
+          <text class="icon icon-arrow"></text>
+        </view>
+      </view>
+      <view class="panel-item-wrap" hover-class="panel-item-wrap-hover" bindtap="handleClickPanelItem">
+        <view class="panel-item">
+          <text class="panel-icon icon icon-about"></text>
+          <view class="panel-item-content">关于我们</view>
+          <text class="icon icon-arrow"></text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

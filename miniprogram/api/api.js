@@ -1,6 +1,7 @@
 const app = getApp();
 const login = (type,userInfo) => {
   return new Promise((resolve, reject) => {
+    console.log(userInfo)
     wx.cloud.callFunction({
       name: 'login',
       data: {

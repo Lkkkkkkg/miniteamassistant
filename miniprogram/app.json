@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/index",
     "pages/index/pages/edit/edit",
-    "pages/index/pages/detail/detail"
+    "pages/index/pages/detail/detail",
+    "pages/user/user"
   ],
   "window": {
     "backgroundColor": "#fff",
@@ -11,5 +12,23 @@
     "navigationBarTitleText": "开黑小帮手",
     "navigationBarTextStyle": "black"
   },
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#1ca2ff",
+    "list": [
+      {
+        "iconPath": "/images/index.png",
+        "selectedIconPath": "/images/index_active.png",
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "iconPath": "/images/user.png",
+        "selectedIconPath": "/images/user_active.png",
+        "pagePath": "pages/user/user",
+        "text": "个人"
+      }
+    ]
+  }
 }

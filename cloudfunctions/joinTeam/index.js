@@ -19,9 +19,12 @@ const formateTime = (time) => {
 }
 const joinTeam = (event, teamItem, resolve, reject) => {
   const db = cloud.database();
+  let participant = teamItem.participant;
+  participant[event.index].player = event.userInfo;
   const p1 = db.collection('teams').doc(event.team_id).update({
     data: {
-      participant: db.command.push(event.userInfo)
+      participant,
+      currentNum: db.command.inc(1)
     }
   });
   //用户添加参与队伍
@@ -113,20 +116,25 @@ exports.main = async(event, context) => {
               data: {},
               message: '活动已结束'
             })
-          } else if (res1[0].data[0].participant.length === res1[0].data[0].maxNum) { //判断队伍是否已满
+          } else if (res1[0].data[0].currentNum === res1[0].data[0].maxNum) { //判断队伍是否已满
             resolve({
               code: 1003,
               data: {},
               message: '队伍已满'
             })
-          } else if (res1[1].data.length > 0 && res1[0].data[0].startTime <= res1[1].data[0].endTime) { //判断是否已有队伍
+          } else if (res1[0].data[0].participant[event.index].player !== null) { //判断位置是否已有人
             resolve({
               code: 1004,
+              data: {},
+              message: '该位置已有人'
+            })
+          }else if (res1[1].data.length > 0 && res1[0].data[0].startTime <= res1[1].data[0].endTime) { //判断是否已有队伍
+            resolve({
+              code: 1005,
               data: {},
               message: '该活动时段内你已经加入了一个队伍'
             })
           }else {
-            console.log(res1[1].data.length > 0, res1[0].data.startTime <= res1[1].data[0].endTime)
             joinTeam({
               team_id: event.team_id,
               userInfo: res.data[0]
