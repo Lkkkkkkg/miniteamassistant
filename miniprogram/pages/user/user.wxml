@@ -1,7 +1,7 @@
 <view class="page">
   <view class="page-header">
     <view class="nickname" wx:if="{{userInfo}}">{{userInfo.nickName}}</view>
-    <button class="login-text" hover-class="login-text-hover" wx:else open-type="getUserInfo" bindgetuserinfo="handleClickLogin">
+    <button class="login-text" hover-class="login-text-hover" wx:else open-type="getUserInfo" bindgetuserinfo="handleClickLogin" disabled="{{1}}">
       <view class="weui-loading" wx:if="{{logining}}"></view>
       <view class="button-label" wx:else>点击授权登录</view>
     </button>

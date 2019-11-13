@@ -157,8 +157,8 @@
 
 .card-right {
   margin-top: 8rpx;
-  width: 196rpx;
-  height: 196rpx;
+  width: 230rpx;
+  height: 230rpx;
   border-radius: 10rpx;
   border: 1rpx solid #ddd;
   overflow: hidden;

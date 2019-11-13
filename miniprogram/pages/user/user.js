@@ -16,10 +16,12 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    this.autoLogin();
+    if (!app.globalData.userInfo) {
+      this.autoLogin();
+    }
   },
   onShow: function (options) {
-    if (app.globalData.userInfo) {
+    if (!this.data.userInfo && app.globalData.userInfo) {
       this.setData({
         userInfo: app.globalData.userInfo
       })
@@ -45,6 +47,7 @@ Page({
   },
   handleClickLogin(e) {
     if (e.detail.userInfo) {
+      if(this.data.logining) return;
       this.setData({
         logining: true
       })

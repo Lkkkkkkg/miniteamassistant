@@ -100,10 +100,11 @@ exports.main = async(event, context) => {
           .get();
         const p2 = db.collection('teams')
           .where({
-            _id: res.data[0].teams[res.data[0].teams.length - 1]
+            _id: res.data[0].teams[res.data[0].teams.length - 1] ? res.data[0].teams[res.data[0].teams.length - 1] : ''
           })
           .get()
         Promise.all([p1,p2]).then((res1)=>{
+          console.log(res1[0].data[0].participant[event.index])
           if (res1[0].data.length === 0) {
             resolve({
               code: 1001,
@@ -137,7 +138,8 @@ exports.main = async(event, context) => {
           }else {
             joinTeam({
               team_id: event.team_id,
-              userInfo: res.data[0]
+              userInfo: res.data[0],
+              index: event.index
             }, res1[0].data[0], resolve, reject)
           }
         })

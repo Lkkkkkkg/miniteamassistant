@@ -21,6 +21,11 @@ page {
   transition: opacity .45s cubic-bezier(.23,1,.32,1);
 }
 
+button[disabled] {
+  color: #666!important;
+  background-color: transparent!important;
+}
+
 .login-text-hover {
   opacity: .6;
 }

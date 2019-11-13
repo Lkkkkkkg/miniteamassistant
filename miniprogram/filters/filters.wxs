@@ -1,7 +1,7 @@
 var formatTime = function(timeStamp) {
   var nowTime = getDate();
   var time = getDate(timeStamp);
-  var diffDates = Math.floor((nowTime - time) / 86400000);
+  var diffDates = nowTime.getDate() - time.getDate();
   var date = '';
   var hour = time.getHours();
   var min = time.getMinutes();

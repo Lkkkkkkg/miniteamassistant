@@ -15,6 +15,8 @@ button::after {
   border: none;
 }
 
+.buto
+
 
 
 /*!
@@ -70,9 +72,4 @@ button::after {
     -webkit-transform: rotate(1turn);
     transform: rotate(1turn);
   }
-}
-
-button[disabled] {
-  color: #fff!important;
-  background-color: #1ca2ff!important;
 }

@@ -28,9 +28,22 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    this.autoLogin();
+    if (!app.globalData.userInfo) {
+      this.autoLogin();
+    }
     this.getActivity();
     this.getTeamList();
+  },
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function() {
+    this.getTeamList();
+    if (!this.data.userInfo && app.globalData.userInfo) {
+      this.setData({
+        userInfo: app.globalData.userInfo
+      })
+    }
   },
   autoLogin() {
     this.setData({
@@ -38,16 +51,16 @@ Page({
     })
     login(0)
       .then((res) => {
-          if(res.result.code === 1000) {
-            this.setData({
-              userInfo: res.result.data.userInfo,
-              logining: false
-            })
-          }else {
-            this.setData({
-              logining: false
-            })
-          }
+        if (res.result.code === 1000) {
+          this.setData({
+            userInfo: res.result.data.userInfo,
+            logining: false
+          })
+        } else {
+          this.setData({
+            logining: false
+          })
+        }
       })
   },
   handleClickTab(e) {
@@ -73,10 +86,10 @@ Page({
         .orderBy('createTime', 'desc')
         .get()
         .then(res => {
-          res.data.forEach(item=>{
+          res.data.forEach(item => {
             item.overdue = new Date().valueOf() > item.endTime ? 1 : 0
           })
-          res.data.sort((a,b)=>{
+          res.data.sort((a, b) => {
             return a.overdue - b.overdue;
           })
           this.setData({
@@ -103,10 +116,11 @@ Page({
   handleClickAdd(e) {
     if (e.detail.userInfo) {
       if (!this.data.userInfo) { //未登录
+        if (this.data.adding) return;
         this.setData({
           adding: true
         })
-        login(1,e.detail.userInfo)
+        login(1, e.detail.userInfo)
           .then((res) => {
             wx.navigateTo({
               url: './pages/edit/edit',
@@ -178,42 +192,44 @@ Page({
   },
   handleClickJoin(e) {
     if (e.detail.userInfo) {
+      const teamListArr = this.data.teamListArr;
+      const team = teamListArr[this.data.dayType].find((item) => {
+        return item._id === e.currentTarget.dataset.team_id
+      })
+      team.participant[e.currentTarget.dataset.index] = {
+        joining: true
+      };
+      this.setData({
+        teamListArr
+      })
       if (!this.data.userInfo) {
         login(1, e.detail.userInfo)
           .then((res) => {
             this.setData({
               userInfo: res.result.data.userInfo
             })
-            this.joinTeam(e, e.detail.userInfo);
+            this.joinTeam(teamListArr, team, e, e.detail.userInfo);
           })
       } else {
-        this.joinTeam(e, e.detail.userInfo);
+        this.joinTeam(teamListArr, team, e, e.detail.userInfo);
       }
     }
   },
-  joinTeam(e, userInfo) {
-    const teamListArr = this.data.teamListArr;
-    const team = teamListArr[this.data.dayType].find((item)=>{
-      return item._id === e.currentTarget.dataset.team_id
-    })
-    team.participant[e.currentTarget.dataset.index] = {
-      joining: true
-    };
-    this.setData({
-      teamListArr
-    })
+  joinTeam(teamListArr, team, e, userInfo) {
     wx.cloud.callFunction({
-      name: 'joinTeam',
-      data: {
-        team_id: team._id,
-        userInfo: this.data.userInfo,
-        index: e.currentTarget.dataset.index
-      }
-    })
+        name: 'joinTeam',
+        data: {
+          team_id: team._id,
+          userInfo: this.data.userInfo,
+          index: e.currentTarget.dataset.index
+        }
+      })
       .then(res => {
         if (res.result.code === 1000) {
           //本地修改信息
-          const { userInfo } = this.data;
+          const {
+            userInfo
+          } = this.data;
           team.participant[e.currentTarget.dataset.index] = {
             joining: false
           };
@@ -261,12 +277,7 @@ Page({
 
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function() {
-    this.getTeamList();
-  },
+
 
   /**
    * 生命周期函数--监听页面隐藏
