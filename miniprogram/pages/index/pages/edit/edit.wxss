@@ -65,6 +65,7 @@ page {
 }
 
 .form-label {
+  width: 128rpx;
   margin-right: 30rpx;
   color: #333;
 }
@@ -138,7 +139,7 @@ page {
 }
 
 .page-footer {
-  margin-top: 382rpx;
+  margin-top: 260rpx;
   display: flex;
   align-items: center;
   justify-content: center;

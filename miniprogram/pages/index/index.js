@@ -10,28 +10,49 @@ Page({
    */
   data: {
     userInfo: null,
-    teamListArr: [null, null, null, null],
-    loginDialogShow: false,
-    loading: true,
-    dayType: 1,
+    activiTypeList: [{
+      typeName: '全部',
+      type: 0
+    }, {
+      typeName: '网游竞技',
+      type: 1
+    }, {
+      typeName: '手游休闲',
+      type: 2
+    }, {
+      typeName: '户外',
+      type: 3
+    }, {
+      typeName: '正能量',
+      type: 4
+    }],
+    tabScrollLeft: 0,
+    teamListArr: [],
+    activityType: 0,
     adding: false,
     logining: false,
-    activityLoading: true,
-    activityTypePickerShow: false,
-    activityTypeList: null,
-    activityTypeValue: [0],
-    activityType: '全部类型',
-    joining: false
+    joining: false,
+    tabBarMove: 15
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
+    this.tabScrollNowLeft = 0;
+    this.windowWidth = wx.getSystemInfoSync().windowWidth;
+    const query = wx.createSelectorQuery().in(this)
+    query.select('#tab_bar').boundingClientRect(res => {
+      this.tabBarWidth = res.width;
+    }).exec()
+    query.select('#tab_0').boundingClientRect(res => {
+      this.setData({
+        tabBarWidth: res.width - 30
+      })
+    }).exec()
     if (!app.globalData.userInfo) {
       this.autoLogin();
     }
-    this.getActivity();
     this.getTeamList();
   },
   /**
@@ -63,26 +84,16 @@ Page({
         }
       })
   },
-  handleClickTab(e) {
-    this.setData({
-      dayType: e.currentTarget.dataset.type
-    });
-    if (!this.data.teamListArr[e.currentTarget.dataset.type]) {
-      this.setData({
-        loading: true
-      })
-      this.getTeamList();
-    }
-  },
   getTeamList() {
     return new Promise((resolve, reject) => {
-      const date = new Date();
-      const todayTime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0).getTime(); //今天的时间
-      const timeArr = [0, todayTime, todayTime + 86400000, todayTime + 172800000]
+      // const date = new Date();
+      // const todayTime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0).getTime(); //今天的时间
+      // const timeArr = [0, todayTime, todayTime + 86400000, todayTime + 172800000]
+      const whereObj = this.data.activityType !== 0 ? {
+        ['activity.activityType']: this.data.activityType
+      } : {}
       db.collection('teams')
-        .where({
-          endTime: db.command.gt(timeArr[this.data.dayType])
-        })
+        .where(whereObj)
         .orderBy('createTime', 'desc')
         .get()
         .then(res => {
@@ -93,8 +104,7 @@ Page({
             return a.overdue - b.overdue;
           })
           this.setData({
-            [`teamListArr[${this.data.dayType}]`]: res.data,
-            loading: false
+            [`teamListArr[${this.data.activityType}]`]: res.data
           });
           resolve(res);
         })
@@ -107,6 +117,35 @@ Page({
         })
     })
   },
+  handleClickTab(e) {
+    this.handleTabsChange(e.currentTarget.dataset.type)
+  },
+  onTabsChange(e) {
+    this.handleTabsChange(e.detail.current)
+  },
+  handleTabScroll(e) {
+    this.tabScrollNowLeft = e.detail.scrollLeft;
+  },
+  handleTabsChange(activityType) {
+    if (this.data.activityType !== activityType) {
+      const query = wx.createSelectorQuery().in(this)
+      query.select(`#tab_${activityType}`).boundingClientRect(res => {
+        console.log(res.width)
+        this.setData({
+          tabScrollLeft: this.tabScrollNowLeft - this.windowWidth / 2 + res.left + res.width / 2,
+          tabBarMove: this.tabScrollNowLeft + res.left + res.width / 2 - (res.width - 30) / 2,
+          tabBarWidth: res.width - 30
+        })
+      }).exec()
+      this.setData({
+        activityType
+      });
+      if (!this.data.teamListArr[activityType]) {
+        this.getTeamList();
+      }
+    }
+  },
+
   toDetail(e) {
     // app.globalData.teamDetail = e.currentTarget.dataset.item;
     // wx.navigateTo({
@@ -139,61 +178,10 @@ Page({
       }
     }
   },
-  getActivity() {
-    db.collection('activities')
-      .get()
-      .then(res => {
-        const activityTypeList = [...['全部类型'], ...res.data.map(item => {
-          return item.activityName
-        })]
-        this.setData({
-          activityLoading: false,
-          activityTypeList
-        })
-      })
-      .catch(err => {
-        wx.showToast({
-          icon: 'none',
-          title: '查询记录失败'
-        });
-      })
-  },
-  showActivityTypePicker() {
-    this.setData({
-      activityTypePickerShow: true
-    })
-  },
-  closeActivityTypePicker() {
-    this.setData({
-      activityTypePickerShow: false
-    })
-  },
-  pickerStart() {
-    this.pickerChanging = true;
-  },
-  pickerEnd() {
-    this.pickerChanging = false;
-  },
-  bindActivityTypeChange(e) {
-    this.setData({
-      activityTypeValue: e.detail.value
-    })
-  },
-  confirmActivityType() {
-    if (this.pickerChanging) return;
-    this.setData({
-      activityTypePickerShow: false
-    });
-    if (this.data.activityType !== this.data.activityTypeList[this.data.activityTypeValue[0]]) {
-      this.setData({
-        activityType: this.data.activityTypeList[this.data.activityTypeValue[0]]
-      })
-    }
-  },
   handleClickJoin(e) {
     if (e.detail.userInfo) {
       const teamListArr = this.data.teamListArr;
-      const team = teamListArr[this.data.dayType].find((item) => {
+      const team = teamListArr[this.data.activityType].find((item) => {
         return item._id === e.currentTarget.dataset.team_id
       })
       team.participant[e.currentTarget.dataset.index] = {

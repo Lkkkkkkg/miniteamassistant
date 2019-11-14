@@ -19,14 +19,20 @@
     <view class="form-item" hover-class="form-item-hover" bindtap="showActivityTypePicker">
       <view class="form-require">*</view>
       <view class="form-label">活动类型</view>
-      <view class="form-value" wx:if="{{activityLoading}}" style="text-align:right"><view class="weui-loading"></view></view>
+      <view class="form-value" wx:if="{{activityLoading}}" style="text-align:right">
+        <view class="weui-loading"></view>
+      </view>
       <view class="form-value" wx:else style="color: {{activityType === null ? '#1ca2ff':''}}">{{activityType !== null ? activityType : '请选择活动类型'}}</view>
+    </view>
+    <view class="form-item" hover-class="form-item-hover" bindtap="showActivityPicker">
+      <view class="form-require">*</view>
+      <view class="form-label">活动</view>
+      <view class="form-value" style="color: {{activity === null ? '#1ca2ff':''}}">{{activity !== null ? activity : '请选择活动类型'}}</view>
     </view>
     <view class="form-item" hover-class="form-item-hover" bindtap="showMaxNumPicker">
       <view class="form-require">*</view>
       <view class="form-label">队伍人数</view>
-      <view class="form-value" wx:if="{{maxNumLoading}}" style="text-align:right"><view class="weui-loading"></view></view>
-      <view class="form-value" wx:else style="color: {{maxNum === null ? '#1ca2ff':''}}">{{activityType !== null ? (maxNum !== null ? maxNum : '请选择队伍人数') : '请选择活动类型'}}</view>
+      <view class="form-value" style="color: {{maxNum === null ? '#1ca2ff':''}}">{{!activityType && '请选择活动类型' || (!activity && '请选择活动') || (!maxNum && '请选择队伍人数') || maxNum}}</view>
     </view>
     <view class="form-item" hover-class="form-item-hover" bindtap="showStartTimePicker">
       <view class="form-require">*</view>
@@ -39,12 +45,13 @@
       <view class="form-value">
         <input class="form-input" value="{{remarks}}" bindinput="handleRemarksInput" placeholder="请填写活动要求"></input>
       </view>
-           <view class="form-item-tips">选填</view>
+      <view class="form-item-tips">选填</view>
     </view>
   </view>
-  <view class="page-footer"><text class="page-logo"></text>开黑小帮手</view>
+  <view class="page-footer">
+    <text class="page-logo"></text>开黑小帮手</view>
   <!-- picker遮罩层 -->
-  <view class="mask {{(activityTypePickerShow || maxNumPickerShow || startTimePickerShow || endTimePickerShow) ? 'mask-show': ''}}"></view>
+  <view class="mask {{(activityTypePickerShow || activityPickerShow || maxNumPickerShow || startTimePickerShow || endTimePickerShow) ? 'mask-show': ''}}"></view>
   <!-- 活动类型picker -->
   <view class="picker-wrap {{activityTypePickerShow?'show':''}}">
     <view class="picker-header">
@@ -56,6 +63,21 @@
       <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{activityTypeValue}}" bindchange="bindActivityTypeChange" bindpickstart="pickerStart" bindpickend="pickerEnd">
         <picker-view-column>
           <view wx:for="{{activityTypeList}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}</view>
+        </picker-view-column>
+      </picker-view>
+    </view>
+  </view>
+  <!-- 活动picker -->
+  <view class="picker-wrap {{activityPickerShow?'show':''}}">
+    <view class="picker-header">
+      <view class="button-cancel" hover-class="picker-button-hover" bindtap="closeActivityPicker">取消</view>
+      <view class="picker-title">活动</view>
+      <view class="button-confirm" hover-class="picker-button-hover" bindtap="confirmActivity">确定</view>
+    </view>
+    <view class="picker-body">
+      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{activityValue}}" bindchange="bindActivityChange" bindpickstart="pickerStart" bindpickend="pickerEnd">
+        <picker-view-column>
+          <view wx:for="{{activityList}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}</view>
         </picker-view-column>
       </picker-view>
     </view>

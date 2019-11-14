@@ -18,114 +18,75 @@
       return 0
     }
   }
-  var caculateTotal = function(type, arr) {
-    if (arr === null) return 0;
-    var total = 0;
-    for (var i = 0; i < arr.length; i++) {
-      if (type === '全部类型' || arr[i].activity.activityName === type) {
-        total = total + 1;
-      }
-    }
-    return total;
-  }
   module.exports = {
     isInside: isInside,
-    boolStatus: boolStatus,
-    caculateTotal: caculateTotal
+    boolStatus: boolStatus
   }
 </wxs>
 
 <view class="page">
-  <view class="page-header">
-    <view class="tabs">
-      <view class="tab {{dayType === 0 ? 'active' : ''}}" data-type="{{0}}" hover-class="tab-0-hover" bindtap="handleClickTab">
-        <view class="tab-label">全部</view>
-        <view class="tab-bar" style="transform: translate3D({{60 * dayType}}px,0,0)"></view>
-      </view>
-      <view class="tab {{dayType === 1 ? 'active' : ''}}" data-type="{{1}}" hover-class="tab-1-hover" bindtap="handleClickTab">
-        <view class="tab-label">今天</view>
-        <view class="tab-bar" style="transform: translate3D({{60 * dayType}}px,0,0)"></view>
-      </view>
-      <view class="tab {{dayType === 2 ? 'active' : ''}}" data-type="{{2}}" hover-class="tab-2-hover" bindtap="handleClickTab">
-        <view class="tab-label">明天</view>
-        <view class="tab-bar" style="transform: translate3D({{60 * dayType}}px,0,0)"></view>
-      </view>
-      <view class="tab {{dayType === 3 ? 'active' : ''}}" data-type="{{3}}" hover-class="tab-3-hover" bindtap="handleClickTab">
-        <view class="tab-label">后天</view>
-        <view class="tab-bar" style="transform: translate3D({{60 * dayType}}px,0,0)"></view>
-      </view>
+  <scroll-view class="page-header" scroll-x="true" scroll-with-animation="true" scroll-left="{{tabScrollLeft}}" style="width: 100%;white-space:nowrap;" bindscroll="handleTabScroll">
+    <view class="tab-container">
+      <view class="tab {{item.type === activityType ? 'tab-active':''}}" id="tab_{{item.type}}" wx:for="{{activiTypeList}}" wx:key="{{index}}" data-type="{{item.type}}" bindtap="handleClickTab">{{item.typeName}}</view>
+      <view id="tab_bar" style="transform: translate3d({{tabBarMove}}px,0,0);width:{{tabBarWidth}}px"></view>
     </view>
-  </view>
+  </scroll-view>
   <view class="page-body">
-    <view class="cards">
-      <view class="cards-info" wx:if="{{!loading && teamListArr[dayType].length > 0}}">
-        <view class="filter" hover-class="filter-hover" bindtap="showActivityTypePicker">
-          <view class="weui-loading" wx:if="{{activityTypeLoading}}"></view>
-          <view wx:if="{{!activityTypeLoading}}">{{activityType}}</view>
-          <text class="filter-icon" wx:if="{{!activityTypeLoading}}"></text>
-        </view>
-        <view class="num">共{{helper.caculateTotal(activityType,teamListArr[dayType])}}个队伍</view>
-      </view>
-      <view bindtap="toDetail" data-item="{{item}}" class="card-wrap" wx:for="{{teamListArr[dayType]}}" wx:key="{{item._id}}" style="opacity: {{helper.boolStatus(item.startTime,item.endTime) === 2 ? '0.4' : '1'}}" hidden="{{activityType !== '全部类型' && item.activity.activityName !== activityType}}">
-        <view class="card">
-          <view class="card-left">
-            <view class="card-title">
-              <view class="card-title-text">{{item.teamName}}</view>
-              <text wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 1}}" class="card-status-icon"></text>
-            </view>
-            <view class="card-time">{{filters.formatTime(item.startTime)}} - {{filters.formatTime(item.endTime)}}</view>
-            <view class="card-participant">
-              <view class="avatar-wrap">
-                <text class="avatar-icon"></text>
-                <image class="avatar-img" src="{{item.creator.avatarUrl}}"></image>
-              </view>
-              <view class="avatar-wrap" wx:for="{{item.participant}}" wx:key="{{item._id}}" wx:for-index="index1" wx:for-item="item1">
-                <image wx:if="{{item1.player}}" class="avatar-img" src="{{item1.player.avatarUrl}}"></image>
-                <button disabled="{{item1.joining}}" data-team_id="{{item._id}}" data-index="{{index1}}" wx:else class="button-join {{item1.joining ? 'button-joing-hover' : ''}}" hover-class="button-joing-hover" open-type="getUserInfo" bindgetuserinfo="handleClickJoin">
-                  <view class="weui-loading" wx:if="{{logining || item1.joining}}"></view>
-                  <text class="button-label" wx:else></text>
-                </button>
-              </view>
-            </view>
-            <view class="card-dialog" wx:if="{{item.remarks}}">
-              <view class="card-dialog-text">{{item.remarks}}</view>
-            </view>
-            <view class="card-avatar-des" wx:if="{{item.maxNum  === item.currentNum}}">已有{{item.currentNum}}人在队伍中, 暂无空位</view>
-            <view class="card-avatar-des" wx:else>已有{{item.currentNum}}人在队伍中, 剩余{{item.maxNum - item.currentNum}}个空位</view>
-            <view class="card-tag">{{item.activity.activityTag}}</view>
+    <swiper class="swiper" duration="225" bindchange="onTabsChange" current="{{activityType}}">
+      <swiper-item wx:for="{{activiTypeList}}" wx:key="{{index}}">
+        <scroll-view scroll-y style="height: 100%;" data-index="{{item.type}}">
+          <view class="cards-tips">
+            <text class="cards-loading" wx:if="{{!teamListArr[item.type]}}"></text>
+            <text class="empty-icon" wx:if="{{teamListArr[item.type] && teamListArr[item.type].length === 0}}"></text>
+            <view class="empty-text" wx:if="{{teamListArr[item.type] && teamListArr[item.type].length === 0}}">还没有队伍，点击右下方的按钮发起组队吧。</view>
           </view>
-          <view class="card-right">
-            <image mode="aspectFill" class="card-logo" src="{{item.activity.activityIcon}}"></image>
-          </view>
-        </view>
+          <view class="cards">
+            <view class="cards-info" wx:if="{{teamListArr[item.type]}}">
+              <view class="num">共{{teamListArr[item.type].length}}个队伍</view>
+            </view>
+            <view bindtap="toDetail" data-item="{{item}}" class="card-wrap" wx:for="{{teamListArr[item.type]}}" wx:key="{{item._id}}" style="opacity: {{helper.boolStatus(item.startTime,item.endTime) === 2 ? '0.4' : '1'}}">
+              <view class="card">
+                <view class="card-left">
+                  <view class="card-title">
+                    <view class="card-title-text">{{item.teamName}}</view>
+                  </view>
+                  <view class="card-time">{{filters.formatTime(item.startTime)}} - {{filters.formatTime(item.endTime)}}
+                    <text wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 1}}" class="card-status-icon"></text>
+                  </view>
+                  <view class="card-participant">
+                    <view class="avatar-wrap">
+                      <text class="avatar-icon"></text>
+                      <image class="avatar-img" src="{{item.creator.avatarUrl}}"></image>
+                    </view>
+                    <view class="avatar-wrap" wx:for="{{item.participant}}" wx:key="{{item._id}}" wx:for-index="index1" wx:for-item="item1">
+                      <image wx:if="{{item1.player}}" class="avatar-img" src="{{item1.player.avatarUrl}}"></image>
+                      <button disabled="{{item1.joining}}" data-team_id="{{item._id}}" data-index="{{index1}}" wx:else class="button-join {{item1.joining ? 'button-joing-hover' : ''}}" hover-class="button-joing-hover" open-type="getUserInfo" bindgetuserinfo="handleClickJoin">
+                        <view class="weui-loading" wx:if="{{logining || item1.joining}}"></view>
+                        <text class="button-label" wx:else></text>
+                      </button>
+                    </view>
+                  </view>
+                  <view class="card-dialog" wx:if="{{item.remarks}}">
+                    <view class="card-dialog-text">{{item.remarks}}</view>
+                  </view>
+                  <view class="card-avatar-des" wx:if="{{item.maxNum  === item.currentNum}}">已有{{item.currentNum}}人在队伍中, 暂无空位</view>
+                  <view class="card-avatar-des" wx:else>已有{{item.currentNum}}人在队伍中, 剩余{{item.maxNum - item.currentNum}}个空位</view>
+                  <view class="card-tag">{{item.activity.activityTag}}</view>
+                </view>
+                <view class="card-right">
+                  <image mode="aspectFill" class="card-logo" src="{{item.activity.activityIcon}}"></image>
+                </view>
+              </view>
 
-      </view>
-    </view>
-    <view class="cards-tips">
-      <text class="cards-loading" wx:if="{{loading}}"></text>
-      <text class="empty-icon" wx:if="{{teamListArr[dayType] && teamListArr[dayType].length === 0}}"></text>
-      <view class="empty-text" wx:if="{{teamListArr[dayType] && teamListArr[dayType].length === 0}}">还没有队伍，点击右下方的按钮发起组队吧。</view>
-    </view>
+            </view>
+          </view>
+
+        </scroll-view>
+      </swiper-item>
+    </swiper>
   </view>
   <button class="button-add {{adding || logining ? 'button-add-loading' : ''}}" hover-class="button-add-hover" open-type="getUserInfo" bindgetuserinfo="handleClickAdd" disabled="{{adding}}">
     <view class="weui-loading" wx:if="{{logining || adding}}"></view>
     <image wx:else class="button-add-icon" src="/images/add_icon.png"></image>
   </button>
-  <!-- picker遮罩层 -->
-  <view class="mask {{(activityTypePickerShow || maxNumPickerShow || startTimePickerShow || endTimePickerShow) ? 'mask-show': ''}}"></view>
-  <!-- 活动类型picker -->
-  <view class="picker-wrap {{activityTypePickerShow?'show':''}}">
-    <view class="picker-header">
-      <view class="button-cancel" hover-class="picker-button-hover" bindtap="closeActivityTypePicker">取消</view>
-      <view class="picker-title">活动类型</view>
-      <view class="button-confirm" hover-class="picker-button-hover" bindtap="confirmActivityType">确定</view>
-    </view>
-    <view class="picker-body">
-      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 240px;" value="{{activityTypeValue}}" bindchange="bindActivityTypeChange" bindpickstart="pickerStart" bindpickend="pickerEnd">
-        <picker-view-column>
-          <view wx:for="{{activityTypeList}}" wx:key="{{item}}" style="line-height: 50px;text-align:center">{{item}}</view>
-        </picker-view-column>
-      </picker-view>
-    </view>
-  </view>
 </view>

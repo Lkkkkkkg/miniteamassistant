@@ -1,79 +1,51 @@
+page,.page,.swiper {
+  height: 100%;
+}
+
+.page-body {
+  height: calc(100% - 102rpx);
+}
+
 .page-header {
   position: sticky;
   top: 0;
   left: 0;
   z-index: 1;
-  padding: 0 30rpx;
   height: 100rpx;
   line-height: 100rpx;
   background-color: #fff;
   border-bottom: 2rpx solid #ddd;
+  font-size: 32rpx;
 }
 
-.tabs {
+.tab-container {
   position: relative;
-  display: inline-flex;
 }
+
 
 .tab {
-  width: 60px;
-  text-align: center;
-  font-size: 34rpx;
-  color: #333;
-  transition: color 0.225s cubic-bezier(0.23, 1, 0.32, 1);
+  display: inline-block;
+  padding: 0 15px;
 }
 
-.tab-0-hover {
+.tab-active {
   color: #1ca2ff;
 }
 
-.tab-0-hover .tab-bar {
-  transform: translate3d(0, 0, 0) !important;
-}
-
-.tab-1-hover {
-  color: #1ca2ff;
-}
-
-.tab-1-hover .tab-bar {
-  transform: translate3d(120rpx, 0, 0) !important;
-}
-
-.tab-2-hover {
-  color: #1ca2ff;
-}
-
-.tab-2-hover .tab-bar {
-  transform: translate3d(240rpx, 0, 0) !important;
-}
-
-.tab-3-hover {
-  color: #1ca2ff;
-}
-
-.tab-3-hover .tab-bar {
-  transform: translate3d(360rpx, 0, 0) !important;
-}
-
-.tab-bar {
+#tab_bar {
   position: absolute;
-  left: 14px;
-  bottom: -2rpx;
+  width: 62rpx;
+  bottom: 0;
+  left: 0;
   height: 4rpx;
-  width: 34px;
   background-color: #1ca2ff;
-  z-index: 1;
-  transition: transform 0.225s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-.tab.active {
-  color: #1ca2ff;
+  transition: transform .225s cubic-bezier(.23,1,.32,1);
 }
 
 .cards-info {
   position: sticky;
   z-index: 1;
-  top: 102rpx;
+  top: 0;
   left: 0;
   height: 72rpx;
   line-height: 72rpx;
@@ -85,6 +57,7 @@
 }
 
 .num {
+  margin-left: auto;
   color: #888;
 }
 
@@ -126,6 +99,7 @@
 }
 
 .card-left {
+  margin-right: 30rpx;
   font-size: 30rpx;
   color: #333;
   flex: 1;
@@ -157,8 +131,8 @@
 
 .card-right {
   margin-top: 8rpx;
-  width: 230rpx;
-  height: 230rpx;
+  width: 234rpx;
+  height: 234rpx;
   border-radius: 10rpx;
   border: 1rpx solid #ddd;
   overflow: hidden;
@@ -183,6 +157,7 @@
 }
 
 .card-participant {
+  overflow: hidden;
   display: flex;
   color: #666;
   align-items: center;

@@ -14,8 +14,11 @@ Page({
     activityTypeList: null,
     activityTypeValue: [0],
     activityType: null,
+    activityPickerShow: false,
+    activityList: null,
+    activityValue: [0],
+    activity: null,
     maxNumPickerShow: false,
-    maxNumLoading: false,
     maxNumList: null,
     maxNumValue: [0],
     maxNum: null,
@@ -46,8 +49,9 @@ Page({
       .get()
       .then(res => {
         const activityTypeList = res.data.map(item => {
-          return item.activityName
-        })
+          return item.typeName
+        });
+        this.activities = res.data;
         this.setData({
           activityLoading: false,
           activityTypeList
@@ -61,6 +65,7 @@ Page({
       })
   },
   handleTeamNameInput(e) {
+    console.log(1)
     this.setData({
       teamName: e.detail.value
     })
@@ -94,34 +99,64 @@ Page({
   confirmActivityType() {
     if (this.pickerChanging) return;
     this.setData({
-      activityTypePickerShow: false
+      activityTypePickerShow: false,
+      activityType: this.data.activityTypeList[this.data.activityTypeValue[0]],
+      activityList: this.activities[this.data.activityTypeValue[0]].children.map(item => (item.activityName))
     });
-    if (this.data.activityType !== this.data.activityTypeList[this.data.activityTypeValue[0]]) {
-      this.setData({
-        activityType: this.data.activityTypeList[this.data.activityTypeValue[0]],
-        maxNumLoading: true
+    // if (this.data.activityType !== this.data.activityTypeList[this.data.activityTypeValue[0]]) {
+    //   this.setData({
+    //     activityType: this.data.activityTypeList[this.data.activityTypeValue[0]],
+    //     maxNumLoading: true
+    //   })
+    //   db.collection('activities')
+    //     .where({
+    //       activityType: this.data.activityTypeValue[0]
+    //     })
+    //     .get()
+    //     .then(res => {
+    //       const maxNumList = Array.from({
+    //         length: res.data[0].maxNum - 1
+    //       }).map((item, index) => {
+    //         return index + 2;
+    //       });
+    //       this.setData({
+    //         maxNumList,
+    //         maxNumLoading: false,
+    //         activity: res.data[0]
+    //       })
+    //     })
+    // }
+  },
+  showActivityPicker() {
+    if (!this.data.activityType) return;
+    this.setData({
+      activityPickerShow: true
+    })
+  },
+  closeActivityPicker() {
+    this.setData({
+      activityPickerShow: false
+    })
+  },
+  bindActivityChange(e) {
+    this.setData({
+      activityValue: e.detail.value
+    })
+  },
+  confirmActivity() {
+    if (this.pickerChanging) return;
+    this.setData({
+      activityPickerShow: false,
+      activity: this.activities[this.data.activityTypeValue[0]].children[this.data.activityValue[0]].activityName,
+      maxNumList: Array.from({
+        length: this.activities[this.data.activityTypeValue[0]].children[this.data.activityValue[0]].maxNum - 1
+      }).map((item, index) => {
+        return index + 2;
       })
-      db.collection('activities')
-        .where({
-          activityType: this.data.activityTypeValue[0]
-        })
-        .get()
-        .then(res => {
-          const maxNumList = Array.from({
-            length: res.data[0].maxNum - 1
-          }).map((item, index) => {
-            return index + 2;
-          });
-          this.setData({
-            maxNumList,
-            maxNumLoading: false,
-            activity: res.data[0]
-          })
-        })
-    }
+    });
   },
   showMaxNumPicker() {
-    if (!this.data.activityType || this.data.maxNumLoading) return;
+    if (!this.data.activityType || !this.data.activity) return;
     this.setData({
       maxNumPickerShow: true
     })
@@ -214,7 +249,7 @@ Page({
           data: {
             createTime: new Date().getTime(),
             teamName: this.data.teamName,
-            activity: this.data.activity,
+            activity: this.activities[this.data.activityTypeValue[0]].children[this.data.activityValue[0]],
             maxNum: this.data.maxNum,
             currentNum: 1,
             startTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[0][0], this.data.duration[0][1], this.data.duration[0][2], 0).getTime(),
