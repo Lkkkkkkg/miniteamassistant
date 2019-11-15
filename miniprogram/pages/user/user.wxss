@@ -78,6 +78,7 @@ button[disabled] {
 }
 
 .extra-num {
+  margin-bottom: 6rpx;
   font-size: 40rpx;
   color: #555;
 }

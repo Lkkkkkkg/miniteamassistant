@@ -32,7 +32,9 @@ Page({
     adding: false,
     logining: false,
     joining: false,
-    tabBarMove: 15
+    tabBarMove: 15,
+    swiperHeight: [wx.getSystemInfoSync().windowHeight - 87],
+    bodyMinHeight: wx.getSystemInfoSync().windowHeight - 87
   },
 
   /**
@@ -41,6 +43,7 @@ Page({
   onLoad: function(options) {
     this.tabScrollNowLeft = 0;
     this.windowWidth = wx.getSystemInfoSync().windowWidth;
+    this.cardsMinHeight = wx.getSystemInfoSync().windowHeight - 87;
     const query = wx.createSelectorQuery().in(this)
     query.select('#tab_bar').boundingClientRect(res => {
       this.tabBarWidth = res.width;
@@ -53,7 +56,6 @@ Page({
     if (!app.globalData.userInfo) {
       this.autoLogin();
     }
-    this.getTeamList();
   },
   /**
    * 生命周期函数--监听页面显示
@@ -91,22 +93,31 @@ Page({
       // const timeArr = [0, todayTime, todayTime + 86400000, todayTime + 172800000]
       const whereObj = this.data.activityType !== 0 ? {
         ['activity.activityType']: this.data.activityType
-      } : {}
+      } : {},
+      currentType = this.data.activityType
       db.collection('teams')
         .where(whereObj)
         .orderBy('createTime', 'desc')
         .get()
         .then(res => {
-          res.data.forEach(item => {
-            item.overdue = new Date().valueOf() > item.endTime ? 1 : 0
-          })
-          res.data.sort((a, b) => {
-            return a.overdue - b.overdue;
-          })
-          this.setData({
-            [`teamListArr[${this.data.activityType}]`]: res.data
-          });
-          resolve(res);
+          if (this.data.activityType === currentType) {
+            res.data.forEach(item => {
+              item.overdue = new Date().valueOf() > item.endTime ? 1 : 0
+            })
+            res.data.sort((a, b) => {
+              return a.overdue - b.overdue;
+            })
+            this.setData({
+              [`teamListArr[${this.data.activityType}]`]: res.data
+            });
+            const query = wx.createSelectorQuery().in(this)
+            query.select(`#cards_${this.data.activityType}`).boundingClientRect(res => {
+              this.setData({
+                [`swiperHeight[${this.data.activityType}]`]: res.height < this.cardsMinHeight ? this.cardsMinHeight : res.height
+              })
+            }).exec()
+            resolve(res);
+          }
         })
         .catch(err => {
           wx.showToast({
@@ -285,9 +296,6 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function() {
-    this.getTeamList().then(() => {
-      wx.stopPullDownRefresh();
-    })
   },
 
   /**

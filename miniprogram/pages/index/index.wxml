@@ -25,25 +25,30 @@
 </wxs>
 
 <view class="page">
-  <scroll-view class="page-header" scroll-x="true" scroll-with-animation="true" scroll-left="{{tabScrollLeft}}" style="width: 100%;white-space:nowrap;" bindscroll="handleTabScroll">
-    <view class="tab-container">
-      <view class="tab {{item.type === activityType ? 'tab-active':''}}" id="tab_{{item.type}}" wx:for="{{activiTypeList}}" wx:key="{{index}}" data-type="{{item.type}}" bindtap="handleClickTab">{{item.typeName}}</view>
-      <view id="tab_bar" style="transform: translate3d({{tabBarMove}}px,0,0);width:{{tabBarWidth}}px"></view>
-    </view>
-  </scroll-view>
+  <view class="page-header">
+    <scroll-view class="tab-scroll-wrap" scroll-x="true" scroll-with-animation="true" scroll-left="{{tabScrollLeft}}" style="width: 100%;white-space:nowrap;" bindscroll="handleTabScroll">
+      <view class="tab-container">
+        <view class="tab {{item.type === activityType ? 'tab-active':''}}" id="tab_{{item.type}}" wx:for="{{activiTypeList}}" wx:key="{{index}}" data-type="{{item.type}}" bindtap="handleClickTab">{{item.typeName}}</view>
+        <view id="tab_bar" style="transform: translate3d({{tabBarMove}}px,0,0);width:{{tabBarWidth}}px"></view>
+      </view>
+    </scroll-view>
+
+  </view>
   <view class="page-body">
-    <swiper class="swiper" duration="225" bindchange="onTabsChange" current="{{activityType}}">
+    <swiper duration="225" bindchange="onTabsChange" current="{{activityType}}">
       <swiper-item wx:for="{{activiTypeList}}" wx:key="{{index}}">
-        <scroll-view scroll-y style="height: 100%;" data-index="{{item.type}}">
-          <view class="cards-tips">
-            <text class="cards-loading" wx:if="{{!teamListArr[item.type]}}"></text>
-            <text class="empty-icon" wx:if="{{teamListArr[item.type] && teamListArr[item.type].length === 0}}"></text>
-            <view class="empty-text" wx:if="{{teamListArr[item.type] && teamListArr[item.type].length === 0}}">还没有队伍，点击右下方的按钮发起组队吧。</view>
+        <scroll-view scroll-y style="height: 100%;">
+          <view class="tips-emtpy {{teamListArr[item.type] && teamListArr[item.type].length === 0 ? 'tips-show' : ''}}">
+            <text class="empty-icon"></text>
+            <view class="empty-text">还没有队伍，点击右下方的按钮发起组队吧。</view>
           </view>
-          <view class="cards">
-            <view class="cards-info" wx:if="{{teamListArr[item.type]}}">
-              <view class="num">共{{teamListArr[item.type].length}}个队伍</view>
-            </view>
+          <view class="tips-loading {{!teamListArr[item.type] ? 'tips-show' : ''}}">
+            <text class="cards-loading"></text>
+          </view>
+          <view class="cards-info" wx:if="{{teamListArr[item.type]}}">
+            <view class="num">共{{teamListArr[item.type].length}}个队伍</view>
+          </view>
+          <view class="cards {{teamListArr[item.type] ? 'cards-show' : ''}}" id="cards_{{item.type}}">
             <view bindtap="toDetail" data-item="{{item}}" class="card-wrap" wx:for="{{teamListArr[item.type]}}" wx:key="{{item._id}}" style="opacity: {{helper.boolStatus(item.startTime,item.endTime) === 2 ? '0.4' : '1'}}">
               <view class="card">
                 <view class="card-left">
@@ -80,7 +85,6 @@
 
             </view>
           </view>
-
         </scroll-view>
       </swiper-item>
     </swiper>
