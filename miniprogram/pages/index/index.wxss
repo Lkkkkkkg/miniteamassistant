@@ -354,16 +354,7 @@ page, .page, swiper {
   font-size: 28rpx;
   font-weight: bold;
   color: #777;
-  transform: translate3d(0, 100px, 0);
-  opacity: 0;
-  transition: transform 0.4s  cubic-bezier(0.23, 1, 0.32, 1) 0.7s,opacity 4s  cubic-bezier(0.23, 1, 0.32, 1) 0.7s;
 }
-
-.tips-show .empty-text {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
 .button-add {
   position: fixed;
   right: 30rpx;

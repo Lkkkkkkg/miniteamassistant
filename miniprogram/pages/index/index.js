@@ -151,9 +151,7 @@ Page({
       this.setData({
         activityType
       });
-      if (!this.data.teamListArr[activityType]) {
-        this.getTeamList();
-      }
+      this.getTeamList();
     }
   },
 
