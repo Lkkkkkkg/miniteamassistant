@@ -22,7 +22,7 @@ Page({
     }, {
       typeName: '户外',
       type: 3
-    }, {
+    },  {
       typeName: '正能量',
       type: 4
     }],
