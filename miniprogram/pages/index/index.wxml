@@ -34,15 +34,14 @@
     </scroll-view>
   </view>
   <view class="page-body">
-
     <view class="tips-loading {{!teamListArr[activityType] ? 'tips-show' : ''}}">
       <text class="cards-loading"></text>
     </view>
     <view class="cards-info" wx:if="{{teamListArr[activityType]}}">
       <view class="num">共{{teamListArr[activityType].length}}个队伍</view>
     </view>
-    <view class="cards {{teamListArr[activityType] ? 'cards-show' : ''}}" id="cards_{{activityType}}">
-      <view class="tips-emtpy" wx:if="{{teamListArr[activityType] && teamListArr[activityType].length === 0}}">
+    <view wx:for="{{teamListArr}}" wx:if="{{index === activityType}}" wx:key="{{index}}" class="cards {{item ? 'cards-show' : ''}}" id="cards_{{activityType}}">
+      <view class="tips-emtpy" wx:if="{{item && item.length === 0}}">
         <text class="empty-icon"></text>
       </view>
       <view bindtap="toDetail" data-item="{{item}}" class="card-wrap" wx:for="{{teamListArr[activityType]}}" wx:key="{{item._id}}" style="opacity: {{helper.boolStatus(item.startTime,item.endTime) === 2 ? '0.4' : '1'}}">

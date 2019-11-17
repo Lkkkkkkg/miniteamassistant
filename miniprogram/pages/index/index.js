@@ -175,6 +175,10 @@ Page({
         scrollTop: 0,
         duration: 300
       });
+      wx.showToast({
+        icon: 'none',
+        title: '刷新成功'
+      })
       this.hasRefresh = true;
     })
   },
