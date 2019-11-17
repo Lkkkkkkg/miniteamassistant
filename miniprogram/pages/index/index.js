@@ -22,7 +22,7 @@ Page({
     }, {
       typeName: '户外',
       type: 3
-    },  {
+    }, {
       typeName: '正能量',
       type: 4
     }],
@@ -33,7 +33,8 @@ Page({
     logining: false,
     joining: false,
     tabBarMove: 15,
-    refreshing: false
+    refreshing: false,
+    scrollTopArr: []
   },
 
   /**
@@ -42,7 +43,7 @@ Page({
   onLoad: function(options) {
     this.tabScrollNowLeft = 0;
     this.windowWidth = wx.getSystemInfoSync().windowWidth;
-    this.cardsMinHeight = wx.getSystemInfoSync().windowHeight - 87;
+    this.currentScrollTop = 0;
     const query = wx.createSelectorQuery().in(this)
     query.select('#tab_bar').boundingClientRect(res => {
       this.tabBarWidth = res.width;
@@ -91,9 +92,9 @@ Page({
       // const todayTime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0).getTime(); //今天的时间
       // const timeArr = [0, todayTime, todayTime + 86400000, todayTime + 172800000]
       const whereObj = this.data.activityType !== 0 ? {
-        ['activity.activityType']: this.data.activityType
-      } : {},
-      currentType = this.data.activityType
+          ['activity.activityType']: this.data.activityType
+        } : {},
+        currentType = this.data.activityType
       db.collection('teams')
         .where(whereObj)
         .orderBy('createTime', 'desc')
@@ -134,7 +135,6 @@ Page({
     if (this.data.activityType !== activityType) {
       const query = wx.createSelectorQuery().in(this)
       query.select(`#tab_${activityType}`).boundingClientRect(res => {
-        console.log(res.width)
         this.setData({
           tabScrollLeft: this.tabScrollNowLeft - this.windowWidth / 2 + res.left + res.width / 2,
           tabBarMove: this.tabScrollNowLeft + res.left + res.width / 2 - (res.width - 30) / 2,
@@ -142,10 +142,15 @@ Page({
         })
       }).exec()
       this.setData({
-        activityType
+        activityType,
+        [`scrollTopArr[${this.data.activityType}]`]: this.currentScrollTop
       });
-      this.getTeamList();
+      if (!this.data.teamListArr[activityType]) this.getTeamList();
     }
+    wx.pageScrollTo({
+      scrollTop: this.data.scrollTopArr[activityType],
+      duration: 0
+    });
   },
 
   toDetail(e) {
@@ -155,22 +160,22 @@ Page({
     // })
   },
   handleClickRefresh() {
-    if(this.data.refreshing) return;
+    if (this.data.refreshing) return;
     this.hasRefresh = false;
     this.refreshTime = 0;
     this.setData({
       refreshing: true
     })
-    this.timer = setInterval(()=>{
+    this.timer = setInterval(() => {
       this.refreshTime = this.refreshTime + 1;
-      if(this.hasRefresh) {
+      if (this.hasRefresh) {
         this.setData({
           refreshing: false
         });
         clearInterval(this.timer);
       }
-    },1000)
-    this.getTeamList().then(()=>{
+    }, 1000)
+    this.getTeamList().then(() => {
       wx.pageScrollTo({
         scrollTop: 0,
         duration: 300
@@ -314,8 +319,7 @@ Page({
   /**
    * 页面相关事件处理函数--监听用户下拉动作
    */
-  onPullDownRefresh: function() {
-  },
+  onPullDownRefresh: function() {},
 
   /**
    * 页面上拉触底事件的处理函数
@@ -329,5 +333,8 @@ Page({
    */
   onShareAppMessage: function() {
 
-  }
+  },
+  onPageScroll: function(e) { // 获取滚动条当前位置
+    this.currentScrollTop = e.scrollTop;
+  },
 })
