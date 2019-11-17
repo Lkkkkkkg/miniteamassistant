@@ -33,8 +33,7 @@ Page({
     logining: false,
     joining: false,
     tabBarMove: 15,
-    swiperHeight: [wx.getSystemInfoSync().windowHeight - 87],
-    bodyMinHeight: wx.getSystemInfoSync().windowHeight - 87
+    refreshing: false
   },
 
   /**
@@ -110,12 +109,6 @@ Page({
             this.setData({
               [`teamListArr[${this.data.activityType}]`]: res.data
             });
-            const query = wx.createSelectorQuery().in(this)
-            query.select(`#cards_${this.data.activityType}`).boundingClientRect(res => {
-              this.setData({
-                [`swiperHeight[${this.data.activityType}]`]: res.height < this.cardsMinHeight ? this.cardsMinHeight : res.height
-              })
-            }).exec()
             resolve(res);
           }
         })
@@ -160,6 +153,30 @@ Page({
     // wx.navigateTo({
     //   url: './pages/detail/detail?_id=' + e.currentTarget.dataset.item._id,
     // })
+  },
+  handleClickRefresh() {
+    if(this.data.refreshing) return;
+    this.hasRefresh = false;
+    this.refreshTime = 0;
+    this.setData({
+      refreshing: true
+    })
+    this.timer = setInterval(()=>{
+      this.refreshTime = this.refreshTime + 1;
+      if(this.hasRefresh) {
+        this.setData({
+          refreshing: false
+        });
+        clearInterval(this.timer);
+      }
+    },1000)
+    this.getTeamList().then(()=>{
+      wx.pageScrollTo({
+        scrollTop: 0,
+        duration: 300
+      });
+      this.hasRefresh = true;
+    })
   },
   handleClickAdd(e) {
     if (e.detail.userInfo) {
