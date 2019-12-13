@@ -12,7 +12,6 @@ exports.main = async(event, context) => {
     })
     //内容无违规
     return new Promise((resolve, reject) => {
-      console.log(wxContext.OPENID)
       db.collection('users')
         .where({
           _openid: wxContext.OPENID
@@ -24,7 +23,7 @@ exports.main = async(event, context) => {
               data: event.data
             })
               .then(res2 => {
-                db.collection('users').doc(event.data.creator._id).update({
+                db.collection('users').doc(event.data.participant[0]).update({
                   data: {
                     teams: db.command.push(res2._id)
                   }
@@ -69,7 +68,7 @@ exports.main = async(event, context) => {
                     data: event.data
                   })
                     .then(res2 => {
-                      db.collection('users').doc(event.data.creator._id).update({
+                      db.collection('users').doc(event.data.participant[0]).update({
                         data: {
                           teams: db.command.push(res2._id)
                         }

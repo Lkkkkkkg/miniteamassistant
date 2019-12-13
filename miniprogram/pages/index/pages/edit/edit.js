@@ -237,12 +237,6 @@ Page({
       submiting: true
     });
     const date = new Date();
-    const participant = [];
-    for (var i = 0; i < this.data.maxNum - 1; i++) {
-      participant[i] = {
-        player: null
-      }
-    }
     wx.cloud.callFunction({
         name: "addTeam",
         data: {
@@ -251,18 +245,16 @@ Page({
             teamName: this.data.teamName,
             activity: this.activities[this.data.activityTypeValue[0]].children[this.data.activityValue[0]],
             maxNum: this.data.maxNum,
-            currentNum: 1,
             startTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[0][0], this.data.duration[0][1], this.data.duration[0][2], 0).getTime(),
             endTime: new Date(date.getFullYear(), date.getMonth(), date.getDate() + this.data.duration[1][0], this.data.duration[1][1], this.data.duration[1][2], 59).getTime(),
-            creator: app.globalData.userInfo,
-            participant,
-            remarks: this.data.remarks
+            participant: [this.data.userInfo._id],
+            remarks: this.data.remarks,
+            tags: []
           }
         }
       })
       .then(res => {
         if (res.result.code === 1000) {
-          console.log(res.result)
           app.globalData.userInfo.teams.push(res.result.data._id);
           wx.navigateBack({
             success() {

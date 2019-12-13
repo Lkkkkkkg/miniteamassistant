@@ -9,7 +9,9 @@ const login = (type,userInfo) => {
       }
     })
       .then(res => {
+        console.log(res)
         if(res.result.code === 1000) app.globalData.userInfo = res.result.data.userInfo;
+        if (res.result.code === 1001) app.globalData.unRegister = true;
         resolve(res);
       })
       .catch(err => {

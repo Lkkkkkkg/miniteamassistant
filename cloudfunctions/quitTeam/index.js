@@ -30,7 +30,7 @@ exports.main = async(event, context) => {
         } else {
           console.log(res.data[0], event.userInfo)
           //队伍表里删除当前用户
-          const findParticipantIndex = res.data[0].participant.findIndex(item => item._id === event.userInfo._id)
+          const findParticipantIndex = res.data[0].participant.findIndex(item => item === event.userInfo._id)
           if (findParticipantIndex === -1) {
             resolve({
               code: 1003,

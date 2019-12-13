@@ -53,7 +53,7 @@ Page({
         tabBarWidth: res.width - 30
       })
     }).exec()
-    if (!app.globalData.userInfo) {
+    if (!app.globalData.userInfo && !app.globalData.unRegister) {
       this.autoLogin();
     }
   },
@@ -91,24 +91,53 @@ Page({
       // const date = new Date();
       // const todayTime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0).getTime(); //今天的时间
       // const timeArr = [0, todayTime, todayTime + 86400000, todayTime + 172800000]
-      const whereObj = this.data.activityType !== 0 ? {
-          ['activity.activityType']: this.data.activityType
-        } : {},
-        currentType = this.data.activityType
-      db.collection('teams')
-        .where(whereObj)
-        .orderBy('createTime', 'desc')
-        .get()
+      // const whereObj = this.data.activityType !== 0 ? {
+      //     ['activity.activityType']: this.data.activityType
+      //   } : {},
+      //   currentType = this.data.activityType
+      // db.collection('teams')
+      //   .where(whereObj)
+      //   .orderBy('createTime', 'desc')
+      //   .get()
+      //   .then(res => {
+      //     if (this.data.activityType === currentType) {
+      //       res.data.forEach(item => {
+      //         item.overdue = new Date().valueOf() > item.endTime ? 1 : 0
+      //       })
+      //       res.data.sort((a, b) => {
+      //         return a.overdue - b.overdue;
+      //       })
+      //       this.setData({
+      //         [`teamListArr[${this.data.activityType}]`]: res.data
+      //       });
+      //       resolve(res);
+      //     }
+      //   })
+      //   .catch(err => {
+      //     wx.showToast({
+      //       icon: 'none',
+      //       title: '查询记录失败'
+      //     })
+      //     reject(err);
+      //   })
+      const currentType = this.data.activityType;
+      wx.cloud.callFunction({
+          name: "getTeamList",
+          data: {
+            activityType: this.data.activityType
+          }
+        })
         .then(res => {
+          console.log(res)
           if (this.data.activityType === currentType) {
-            res.data.forEach(item => {
+            res.result.data.forEach(item => {
               item.overdue = new Date().valueOf() > item.endTime ? 1 : 0
             })
-            res.data.sort((a, b) => {
+            res.result.data.sort((a, b) => {
               return a.overdue - b.overdue;
             })
             this.setData({
-              [`teamListArr[${this.data.activityType}]`]: res.data
+              [`teamListArr[${this.data.activityType}]`]: res.result.data
             });
             resolve(res);
           }
@@ -116,7 +145,7 @@ Page({
         .catch(err => {
           wx.showToast({
             icon: 'none',
-            title: '查询记录失败'
+            title: '云函数调用失败'
           })
           reject(err);
         })
@@ -154,27 +183,16 @@ Page({
   },
 
   toDetail(e) {
-    // app.globalData.teamDetail = e.currentTarget.dataset.item;
-    // wx.navigateTo({
-    //   url: './pages/detail/detail?_id=' + e.currentTarget.dataset.item._id,
-    // })
+    app.globalData.teamDetail = e.currentTarget.dataset.item;
+    wx.navigateTo({
+      url: './pages/detail/detail?_id=' + e.currentTarget.dataset.item._id + '&teamName=' + e.currentTarget.dataset.item.teamName + '&activityName=' + e.currentTarget.dataset.item.activity.activityName,
+    })
   },
   handleClickRefresh() {
     if (this.data.refreshing) return;
-    this.hasRefresh = false;
-    this.refreshTime = 0;
     this.setData({
       refreshing: true
     })
-    this.timer = setInterval(() => {
-      this.refreshTime = this.refreshTime + 1;
-      if (this.hasRefresh) {
-        this.setData({
-          refreshing: false
-        });
-        clearInterval(this.timer);
-      }
-    }, 1000)
     this.getTeamList().then(() => {
       wx.pageScrollTo({
         scrollTop: 0,
@@ -184,33 +202,29 @@ Page({
         icon: 'none',
         title: '刷新成功'
       })
-      this.hasRefresh = true;
+      this.setData({
+        refreshing: false
+      })
     })
   },
   handleClickAdd(e) {
     if (e.detail.userInfo) {
-      if (!this.data.userInfo) { //未登录
-        if (this.data.adding) return;
-        this.setData({
-          adding: true
-        })
-        login(1, e.detail.userInfo)
-          .then((res) => {
-            wx.navigateTo({
-              url: './pages/edit/edit',
-              success: (() => {
-                this.setData({
-                  adding: false,
-                  userInfo: res.result.data.userInfo
-                })
+      if (this.data.adding) return;
+      this.setData({
+        adding: true
+      })
+      login(1, e.detail.userInfo)
+        .then((res) => {
+          wx.navigateTo({
+            url: './pages/edit/edit',
+            success: (() => {
+              this.setData({
+                adding: false,
+                userInfo: res.result.data.userInfo
               })
             })
           })
-      } else {
-        wx.navigateTo({
-          url: './pages/edit/edit'
         })
-      }
     }
   },
   handleClickJoin(e) {

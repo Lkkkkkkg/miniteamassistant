@@ -25,14 +25,16 @@ page {
 }
 
 .weui-navigation-bar__inner .weui-navigation-bar__left {
+  flex: 0;
   position: relative;
   width: var(--right);
-  padding-left: 16px;
+  padding: 0 12px;
   display: -webkit-box;
   display: -webkit-flex;
   display: flex;
   align-items: center;
   -webkit-box-pack: center;
+  font-size: 0;
 }
 
 .weui-navigation-bar__inner .weui-navigation-bar__left .weui-navigation-bar__btn {
@@ -51,8 +53,8 @@ page {
 }
 
 .icon-left {
-  width: 18px;
-  height: 18px;
+  width: 19px;
+  height: 19px;
 }
 
 .weui-navigation-bar__inner .weui-navigation-bar__left .weui-navigation-bar__btn_goback:active {
@@ -60,17 +62,14 @@ page {
 }
 
 .weui-navigation-bar__inner .weui-navigation-bar__center {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 0;
+  overflow: hidden;
+
   font-size: 17px;
-  text-align: center;
   position: relative;
   flex: 1;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: flex;
-  align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
   font-weight: bold;
 }
 

@@ -34,58 +34,65 @@
     </scroll-view>
   </view>
   <view class="page-body">
-    <view class="tips-loading {{!teamListArr[activityType] ? 'tips-show' : ''}}">
-      <text class="cards-loading"></text>
+    <view class="tips-loading" hidden="{{!!teamListArr[activityType]}}">
+      <text class="weui-loading cards-loading"></text>
+      <view class="loading-text">正在加载</view>
     </view>
     <view class="cards-info" wx:if="{{teamListArr[activityType]}}">
       <view class="num">共{{teamListArr[activityType].length}}个队伍</view>
     </view>
-      <view wx:for="{{teamListArr}}" wx:key="{{index}}" class="cards" hidden="{{index !== activityType}}">
-        <view class="tips-emtpy" wx:if="{{item && item.length === 0}}">
-          <text class="empty-icon"></text>
-        </view>
-        <view bindtap="toDetail" data-item="{{item}}" class="card-wrap" wx:for="{{item}}" wx:key="{{item._id}}" style="opacity: {{helper.boolStatus(item.startTime,item.endTime) === 2 ? '0.4' : '1'}}">
-          <view class="card">
-            <view class="card-left">
-              <view class="card-title">
-                <view class="card-title-text">{{item.teamName}}</view>
+    <view wx:for="{{teamListArr}}" wx:key="{{index}}" class="cards" hidden="{{index !== activityType}}">
+      <view class="tips-emtpy" wx:if="{{item && item.length === 0}}">
+        <text class="empty-icon"></text>
+        <view class="empty-title">暂无队伍</view>
+        <view class="empty-text">点击右下方的按钮发起组队</view>
+      </view>
+      <view bindtap="toDetail" data-item="{{item1}}" class="card-wrap" wx:for="{{item}}" wx:key="{{item1._id}}" style="opacity: {{helper.boolStatus(item1.startTime,item1.endTime) === 2 ? '0.4' : '1'}}" wx:for-index="index1" wx:for-item="item1">
+        <view class="card">
+          <view class="card-left">
+            <view class="card-title">
+              <view class="card-title-text">{{item1.teamName}}</view>
+            </view>
+            <view class="card-time">{{filters.formatTime(item1.startTime)}} - {{filters.formatTime(item1.endTime)}}
+              <text wx:if="{{helper.boolStatus(item1.startTime,item1.endTime) === 1}}" class="card-status-icon"></text>
+            </view>
+            <view class="card-participant">
+              <view class="avatar-wrap" wx:for="{{item1.participant}}" wx:key="{{item._id}}" wx:for-index="index2" wx:for-item="item2">
+                <text class="avatar-icon" wx:if="{{index2 === 0}}"></text>
+                <image class="avatar-img" src="{{item2.avatarUrl}}"></image>
               </view>
-              <view class="card-time">{{filters.formatTime(item.startTime)}} - {{filters.formatTime(item.endTime)}}
-                <text wx:if="{{helper.boolStatus(item.startTime,item.endTime) === 1}}" class="card-status-icon"></text>
-              </view>
-              <view class="card-participant">
-                <view class="avatar-wrap">
-                  <text class="avatar-icon"></text>
-                  <image class="avatar-img" src="{{item.creator.avatarUrl}}"></image>
-                </view>
-                <view class="avatar-wrap" wx:for="{{item.participant}}" wx:key="{{item._id}}" wx:for-index="index1" wx:for-item="item1">
-                  <image wx:if="{{item1.player}}" class="avatar-img" src="{{item1.player.avatarUrl}}"></image>
-                  <button disabled="{{item1.joining}}" data-team_id="{{item._id}}" data-index="{{index1}}" wx:else class="button-join {{item1.joining ? 'button-joing-hover' : ''}}" hover-class="button-joing-hover" open-type="getUserInfo" bindgetuserinfo="handleClickJoin">
-                    <view class="weui-loading" wx:if="{{logining || item1.joining}}"></view>
+              <!-- <view class="avatar-wrap" wx:for="{{item.participant}}" wx:key="{{item._id}}" wx:for-index="index2" wx:for-item="item2">
+                  <image wx:if="{{item2.player}}" class="avatar-img" src="{{item2.player.avatarUrl}}"></image>
+                  <button disabled="{{item2.joining}}" data-team_id="{{item._id}}" data-index="{{index2}}" wx:else class="button-join {{item2.joining ? 'button-joing-hover' : ''}}" hover-class="button-joing-hover" open-type="getUserInfo" bindgetuserinfo="handleClickJoin">
+                    <view class="weui-loading" wx:if="{{logining || item2.joining}}"></view>
                     <text class="button-label" wx:else></text>
                   </button>
-                </view>
-              </view>
-              <view class="card-dialog" wx:if="{{item.remarks}}">
-                <view class="card-dialog-text">{{item.remarks}}</view>
-              </view>
-              <view class="card-avatar-des" wx:if="{{item.maxNum  === item.currentNum}}">已有{{item.currentNum}}人在队伍中, 暂无空位</view>
-              <view class="card-avatar-des" wx:else>已有{{item.currentNum}}人在队伍中, 剩余{{item.maxNum - item.currentNum}}个空位</view>
-              <view class="card-tag">{{item.activity.activityTag}}</view>
+                </view> -->
             </view>
-            <view class="card-right">
-              <image mode="aspectFill" class="card-logo" src="{{item.activity.activityIcon}}"></image>
+            <view class="card-dialog" wx:if="{{item1.remarks}}">
+              <view class="card-dialog-text">{{item1.remarks}}</view>
             </view>
+            <view class="card-avatar-des" wx:if="{{item1.maxNum  === item1.participant.length}}">已有{{item1.participant.length}}人在队伍中, 暂无空位</view>
+            <view class="card-avatar-des" wx:else>已有{{item1.participant.length}}人在队伍中, 剩余{{item1.maxNum - item1.participant.length}}个空位</view>
+          </view>
+          <view class="card-right">
+            <view class="card-logo-tag">{{item1.activity.activityTag}}</view>
+            <image mode="aspectFill" class="card-logo" src="{{item1.activity.activityIcon}}"></image>
           </view>
         </view>
       </view>
+    </view>
   </view>
-  <button class="button-add {{adding || logining ? 'button-add-loading' : ''}}" hover-class="button-add-hover" open-type="getUserInfo" bindgetuserinfo="handleClickAdd" disabled="{{adding}}">
+  <button class="button-refresh {{logining ? 'button-add-loading' : ''}}" hover-class="button-refresh-hover" bindtap="handleClickRefresh" disabled="{{refreshing}}">
+    <view class="weui-loading" wx:if="{{logining || refreshing}}"></view>
+    <text wx:else class="button-refresh-label"></text>
+  </button>
+  <button wx:if="{{!userInfo}}" class="button-add {{adding || logining ? 'button-add-loading' : ''}}" hover-class="button-add-hover" open-type="getUserInfo" bindgetuserinfo="handleClickAdd" disabled="{{logining ||adding}}">
     <view class="weui-loading" wx:if="{{logining || adding}}"></view>
-    <image wx:else class="button-add-icon" src="/images/add_icon.png"></image>
+    <text wx:else class="button-add-label"></text>
   </button>
-  <button class="button-refresh {{logining ? 'button-add-loading' : ''}}" hover-class="button-add-hover" bindtap="handleClickRefresh" disabled="{{refreshing}}">
-    <view class="weui-loading" wx:if="{{logining}}"></view>
-    <text wx:else class="button-refresh-label {{refreshing ? 'button-refresh-label-active' : ''}}"></text>
-  </button>
+  <navigator url="./pages/edit/edit" wx:else class="button-add {{adding || logining ? 'button-add-loading' : ''}}" hover-class="button-add-hover" disabled="{{logining || adding}}">
+    <view class="weui-loading" wx:if="{{logining || adding}}"></view>
+    <text wx:else class="button-add-label"></text>
+  </navigator>
 </view>

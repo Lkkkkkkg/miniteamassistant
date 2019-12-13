@@ -1,78 +1,92 @@
 <wxs src="../../../../filters/filters.wxs" module="filters" />
 <wxs module="helper">
-  var isInside = function(arr, _id) {
+  var findUser = function(arr, _id) {
+    if (!arr) return;
     for (var i = 0; i < arr.length; i++) {
       if (arr[i]._id === _id) {
-        return true;
+        return arr[i];
       }
     }
     return false;
   }
-  var boolStatus = function(startTime, endTime) {
-    var nowTime = getDate().getTime();
-    if (nowTime > endTime) {
-      return 2
-    } else if (nowTime >= startTime) {
-      return 1
-    } else {
-      return 0
-    }
-  }
   module.exports = {
-    isInside: isInside,
-    boolStatus: boolStatus
+    findUser: findUser
   }
 </wxs>
-<mp-navigation-bar title="队伍详情" back="{{true}}" background="#1ca2ff" color="#fff">
-</mp-navigation-bar>
-<view class="page">
-  <view class="page-disabled" wx:if="{{helper.boolStatus(detail.startTime,detail.endTime) === 2}}">
-    <image class="card-disabled-icon" mode="widthFix" src="/images/overdue_icon_black.png"></image>
-  </view>
+<view class="page-loading" wx:if="{{!detail || logining}}">
+  <text class="weui-loading"></text>
+  <view class="loading-text">正在加载</view>
+</view>
+<view class="page" wx:else>
   <view class="page-header">
-    <view class="page-header-top">
-      <view class="page-title">{{detail.teamName}}</view>
-      <view class="team-duration">{{filters.formatTime(detail.startTime)}} - {{filters.formatTime(detail.endTime)}}</view>
-      <view class="team-duration">{{detail.remarks}}</view>
+    <view class="user-wrap empty" wx:if="{{!helper.findUser(detail.participant,userInfo._id)}}">
+      <button wx:if="{{!userInfo}}" class="user-avatar-wrap" open-type="getUserInfo" hover-class="user-avatar-wrap-hover" bindgetuserinfo="handleClickJoin" style="border: 1rpx dashed #ccc;">
+        <view class="weui-loading" wx:if="{{logining || joining}}"></view>
+        <view class="add-icon" wx:else></view>
+      </button>
+      <button wx:else class="user-avatar-wrap" hover-class="user-avatar-wrap-hover" bindtap="handleClickJoinFast" style="border: 1rpx dashed #ccc;">
+        <view class="weui-loading" wx:if="{{logining || joining}}"></view>
+        <view class="add-icon" wx:else></view>
+      </button>
+      <view class="user-name">点击加入</view>
     </view>
-    <view class="activity-icon-wrap">
-      <view class="activity-des">
-        <view class="activity-name">{{detail.activity.activityName}}</view>
-        <view class="activity-tag">{{detail.activity.activityTag}}</view>
+    <view class="user-wrap" wx:else>
+      <view class="user-avatar-wrap">
+        <image class="user-avatar-img" src="{{helper.findUser(detail.participant,userInfo._id).avatarUrl}}"></image>
+        <view class="button-quit" hover-class="button-quit-hover" bindtap="quitTeam">
+          <view class="weui-loading" wx:if="{{quiting}}"></view>
+          <view class="button-quit-icon" wx:else></view>
+        </view>
       </view>
-      <image class="activity-icon" src="{{detail.activity.activityIcon}}"></image>
+      <view class="user-name">{{helper.findUser(detail.participant,userInfo._id).nickName}}</view>
     </view>
-  </view>
-  <view class="page-body">
-    <view class="page-body-top">
-      <view>
-        <view class="page-title">人员</view>
-        <view class="participants-des" wx:if="{{detail.maxNum  === detail.participant.length}}">已有{{detail.participant.length}}人在队伍中, 暂无空位</view>
-        <view class="participants-des" wx:else>已有{{detail.participant.length}}人在队伍中, 剩余{{detail.maxNum - detail.participant.length}}个空位</view>
-      </view>
-    </view>
-    <view class="participants-wrap">
-      <view class="participant-wrap" wx:for="{{detail.participant}}" wx:key="{{item._id}}">
+    <view class="participant-wrap">
+      <view class="participant-avatar-wrap" wx:for="{{detail.participant}}" wx:key="{{item._id}}" wx:if="{{item._id !== userInfo._id}}">
         <image class="participant-avatar" src="{{item.avatarUrl}}"></image>
         <view class="participant-name">{{item.nickName}}</view>
       </view>
+      <view class="participant-avatar-wrap empty {{(index + (detail.participant[0]._id === userInfo._id ? 1 : 2)) >= detail.maxNum ? 'disabled' : ''}}" wx:for="{{detail.activity.maxNum - 1}}" wx:key="{{index}}">
+        <view class="participant-avatar">
+          <view class="participant-disabled-icon" wx:if="{{(index + (detail.participant[0]._id === userInfo._id ? 1 : 2)) >= detail.maxNum}}"></view>
+        </view>
+        <view class="participant-name">{{(index + (detail.participant[0]._id === userInfo._id ? 1 : 2)) >= detail.maxNum ? '未开放' : '虚位以待'}}</view>
+      </view>
     </view>
+    <!-- <view class="team-extra">
+      <view class="team-extra-item">
+        <view class="team-extra-item-icon"></view>
+        {{filters.formatTime(detail.startTime)}} - {{filters.formatTime(detail.endTime)}}
+      </view>
+    </view> -->
   </view>
+  <view class="team-extra">{{filters.formatTime(detail.startTime)}} - {{filters.formatTime(detail.endTime)}}</view>
+  <view class="team-extra" style="top: 443rpx;">{{detail.remarks ? detail.remarks : '暂无公告'}}</view>
+  <view class="message-tips" bindtap="scrollToBottom" hidden="{{!showTips}}"></view>
+  <scroll-view class="page-body" scroll-y scroll-with-animation="{{scrollWithAnimation}}" scroll-top="{{scrollTop}}" bindscroll="onScroll">
+    <view class="page-loading" wx:if="{{!messageList || logining}}">
+      <text class="weui-loading"></text>
+    </view>
+    <view class="message" wx:for="{{messageList}}" wx:key="{{item._id}}" style="{{item.author_id === userInfo._id? 'justify-content: flex-end' : ''}}">
+      <view class="message-right" wx:if="{{item.author_id === userInfo._id}}">
+        <view class="message-content">{{item.textContent}}</view>
+        <image class="message-avatar" src="{{item.avatar}}"></image>
+      </view>
+      <view class="message-left" wx:else>
+        <image class="message-avatar" src="{{item.avatar}}"></image>
+        <view class="message-main">
+          <view class="message-name">{{item.nickName}}</view>
+          <view class="message-content">{{item.textContent}}</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
   <view class="page-footer">
-    <view style="display:flex">
-      <button wx:if="{{userInfo && userInfo._id === detail.creator_id}}" class="button-action {{buttonLoading ? 'button-action-hover' : ''}}" hover-class="button-action-hover" bindtap="disbandTeam">
-        <view class="weui-loading" wx:if="{{buttonLoading}}"></view>
-        <view class="button-label" wx:else>解散队伍</view>
-      </button>
-      <button wx:elif="{{userInfo && helper.isInside(detail.participant,userInfo._id)}}" class="button-action {{buttonLoading ? 'button-action-hover' : ''}}" hover-class="button-action-hover" bindtap="quitTeam">
-        <view class="weui-loading" wx:if="{{buttonLoading}}"></view>
-        <view class="button-label" wx:else>退出队伍</view>
-      </button>
-      <button wx:else class="button-action {{buttonLoading ? 'button-action-hover' : ''}}" hover-class="button-action-hover" open-type="getUserInfo" bindgetuserinfo="handleClickJoin">
-        <view class="weui-loading" wx:if="{{logining || buttonLoading}}"></view>
-        <view class="button-label" wx:else>加入队伍</view>
-      </button>
-      <button class="button-share" hover-class="button-share-hover" open-type="share"></button>
+    <button class="share-icon" hover-class="share-icon-hover" open-type="share"></button>
+    <button class="chat-input" wx:if="{{!userInfo}}" open-type="getUserInfo" bindgetuserinfo="handleClickSend" disabled="{{sending || logining}}">
+    </button>
+    <view class="chat-input" wx:else>
+      <input class="chat-input-value" maxlength="80" confirm-type="send" bindfocus="onFocus" placeholder="留言" value="{{textContent}}" bindinput="bindTextContentInput" bindconfirm="sendMessageFast"></input>
+      <view class="weui-loading" hidden="{{!sending && !logining}}"></view>
     </view>
   </view>
 </view>

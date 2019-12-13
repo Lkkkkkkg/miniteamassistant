@@ -2,10 +2,10 @@
   <view class="weui-navigation-bar__placeholder {{ios ? 'ios' : 'android'}}" style="padding-top: {{statusBarHeight}}px;visibility: hidden;"></view>
   <view class="weui-navigation-bar__inner {{ios ? 'ios' : 'android'}}" style="padding-top: {{statusBarHeight}}px; color: {{color}};background: {{background}};{{displayStyle}};{{innerPaddingRight}};{{innerWidth}};">
 
-    <view class='weui-navigation-bar__left' style="{{leftWidth}}">
+    <view class='weui-navigation-bar__left' >
       <block wx:if="{{back}}">
         <view class="weui-navigation-bar__buttons">
-          <image class="icon-left" src="/images/left.png" slot="left" bindtap="back"></image>
+          <image class="icon-left" src="/images/left_2.png" slot="left" bindtap="back"></image>
         </view>
       </block>
       <block>
